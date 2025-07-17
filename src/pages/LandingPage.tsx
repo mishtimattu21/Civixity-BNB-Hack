@@ -137,7 +137,7 @@ const LandingPage = () => {
                 onClick={() => navigate("/platform")}
                 className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
               >
-                Get Started
+                Sign In
               </Button>
             </div>
           </div>

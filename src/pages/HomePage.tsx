@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -20,58 +20,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { supabase } from "@/lib/supabaseClient";
 
 const HomePage = () => {
-  const [posts, setPosts] = useState([
-    {
-      id: 1,
-      title: "Large Pothole on Main Street",
-      description: "Deep pothole causing traffic issues and potential vehicle damage. Multiple cars have been affected.",
-      author: "Sarah Chen",
-      timestamp: "2 hours ago",
-      location: "Main Street, Downtown",
-      category: "Road Infrastructure",
-      severity: 8,
-      upvotes: 15,
-      downvotes: 2,
-      comments: 7,
-      image: null,
-      similarPosts: 3,
-      aiDetected: true
-    },
-    {
-      id: 2,
-      title: "Broken Streetlight in Park Area",
-      description: "Streetlight has been non-functional for over a week, creating safety concerns for evening walkers.",
-      author: "Mike Johnson",
-      timestamp: "4 hours ago", 
-      location: "Central Park, North Side",
-      category: "Public Safety",
-      severity: 6,
-      upvotes: 23,
-      downvotes: 1,
-      comments: 12,
-      image: null,
-      similarPosts: 1,
-      aiDetected: true
-    },
-    {
-      id: 3,
-      title: "Overflowing Garbage Bins",
-      description: "Multiple garbage bins in the area are overflowing, attracting pests and creating unsanitary conditions.",
-      author: "Emma Wilson",
-      timestamp: "6 hours ago",
-      location: "Market Square",
-      category: "Waste Management",
-      severity: 7,
-      upvotes: 31,
-      downvotes: 0,
-      comments: 18,
-      image: null,
-      similarPosts: 5,
-      aiDetected: true
-    }
-  ]);
+  const [posts, setPosts] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const stories = [
     {
@@ -107,8 +60,82 @@ const HomePage = () => {
   const [newPost, setNewPost] = useState({
     title: "",
     description: "",
-    image: null
+    image: null as File | null
   });
+  const [uploading, setUploading] = useState(false);
+
+  // Fetch posts from Supabase on mount
+  useEffect(() => {
+    const fetchPosts = async () => {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('timestamp', { ascending: false });
+      if (!error && data) {
+        setPosts(data);
+      }
+      setLoading(false);
+    };
+    fetchPosts();
+  }, []);
+
+  // Handle image file selection
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files[0]) {
+      setNewPost({ ...newPost, image: e.target.files[0] });
+    }
+  };
+
+  // Handle new post submission
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUploading(true);
+    let imageUrl = null;
+    if (newPost.image) {
+      const fileExt = newPost.image.name.split('.').pop();
+      const fileName = `${Date.now()}.${fileExt}`;
+      const { data: storageData, error: storageError } = await supabase.storage
+        .from('post-images')
+        .upload(fileName, newPost.image);
+      if (!storageError && storageData) {
+        const { data: publicUrlData } = supabase.storage
+          .from('post-images')
+          .getPublicUrl(storageData.path);
+        imageUrl = publicUrlData.publicUrl;
+      }
+    }
+    // Insert post into Supabase
+    const { error: insertError } = await supabase.from('posts').insert([
+      {
+        title: newPost.title,
+        description: newPost.description,
+        author: "Anonymous", // Replace with user info if using Auth
+        timestamp: new Date().toISOString(),
+        location: "Unknown", // Optionally add location input
+        category: "General", // Optionally add category input
+        severity: 5, // Optionally add severity input
+        upvotes: 0,
+        downvotes: 0,
+        comments: 0,
+        image_url: imageUrl,
+        similar_posts: 0,
+        ai_detected: false
+      }
+    ]);
+    setUploading(false);
+    if (!insertError) {
+      setNewPost({ title: "", description: "", image: null });
+      // Refetch posts
+      const { data, error } = await supabase
+        .from('posts')
+        .select('*')
+        .order('timestamp', { ascending: false });
+      if (!error && data) {
+        setPosts(data);
+      }
+    }
+  };
 
   const handleVote = (postId: number, type: 'up' | 'down') => {
     setPosts(posts.map(post => 
@@ -191,7 +218,7 @@ const HomePage = () => {
           <DialogHeader>
             <DialogTitle className="text-slate-900 dark:text-white">Report New Issue</DialogTitle>
           </DialogHeader>
-          <div className="space-y-4">
+          <form className="space-y-4" onSubmit={handleSubmit}>
             <div>
               <Label htmlFor="title">Issue Title</Label>
               <Input 
@@ -200,6 +227,7 @@ const HomePage = () => {
                 value={newPost.title}
                 onChange={(e) => setNewPost({...newPost, title: e.target.value})}
                 className="bg-white dark:bg-slate-700"
+                required
               />
             </div>
             <div>
@@ -211,123 +239,128 @@ const HomePage = () => {
                 onChange={(e) => setNewPost({...newPost, description: e.target.value})}
                 className="bg-white dark:bg-slate-700"
                 rows={3}
+                required
               />
             </div>
             <div>
               <Label htmlFor="image">Photo (Optional)</Label>
               <div className="flex items-center space-x-2">
-                <Button variant="outline" className="w-full">
-                  <Camera className="h-4 w-4 mr-2" />
-                  Upload Photo
-                </Button>
+                <Input type="file" accept="image/*" id="image" onChange={handleImageChange} />
               </div>
             </div>
-            <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600">
-              Submit Report
+            <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600" type="submit" disabled={uploading}>
+              {uploading ? 'Submitting...' : 'Submit Report'}
             </Button>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
 
       {/* Civic Posts Feed */}
       <div className="space-y-4">
-        {posts.map((post) => (
-          <Card key={post.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
-            <CardContent className="p-6">
-              {/* Post Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center space-x-3">
-                  <Avatar>
-                    <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                      {post.author.split(' ').map(n => n[0]).join('')}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <div className="font-medium text-slate-900 dark:text-white">{post.author}</div>
-                    <div className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
-                      <Clock className="h-3 w-3" />
-                      <span>{post.timestamp}</span>
-                      <MapPin className="h-3 w-3 ml-2" />
-                      <span>{post.location}</span>
+        {loading ? (
+          <div className="text-center text-slate-500 dark:text-slate-400 py-8">Loading posts...</div>
+        ) : (
+          posts.map((post) => (
+            <Card key={post.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+              <CardContent className="p-6">
+                {/* Post Header */}
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center space-x-3">
+                    <Avatar>
+                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                        {post.author.split(' ').map(n => n[0]).join('')}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div>
+                      <div className="font-medium text-slate-900 dark:text-white">{post.author}</div>
+                      <div className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
+                        <Clock className="h-3 w-3" />
+                        <span>{post.timestamp}</span>
+                        <MapPin className="h-3 w-3 ml-2" />
+                        <span>{post.location}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                {post.aiDetected && (
-                  <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                    AI Detected
-                  </Badge>
-                )}
-              </div>
-
-              {/* Post Content */}
-              <div className="mb-4">
-                <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                  {post.title}
-                </h3>
-                <p className="text-slate-600 dark:text-slate-300 mb-3">
-                  {post.description}
-                </p>
-                
-                {/* Tags and Severity */}
-                <div className="flex items-center space-x-2 mb-3">
-                  <Badge variant="outline" className="border-slate-300 dark:border-slate-600">
-                    {post.category}
-                  </Badge>
-                  <Badge className={getSeverityColor(post.severity)}>
-                    <AlertTriangle className="h-3 w-3 mr-1" />
-                    {getSeverityLabel(post.severity)} ({post.severity}/10)
-                  </Badge>
+                  {post.ai_detected && (
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                      AI Detected
+                    </Badge>
+                  )}
                 </div>
 
-                {/* Similar Posts */}
-                {post.similarPosts > 0 && (
-                  <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-3">
-                    <div className="flex items-center justify-between">
-                      <span className="text-sm text-amber-700 dark:text-amber-300">
-                        {post.similarPosts} similar report{post.similarPosts > 1 ? 's' : ''} found in this area
-                      </span>
-                      <Button variant="link" className="text-amber-700 dark:text-amber-300 p-0 h-auto">
-                        View All
-                      </Button>
-                    </div>
+                {/* Post Content */}
+                <div className="mb-4">
+                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
+                    {post.title}
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300 mb-3">
+                    {post.description}
+                  </p>
+                  {post.image_url && (
+                    <img src={post.image_url} alt="Post" className="mb-3 rounded-lg max-h-60 w-full object-cover" />
+                  )}
+                  
+                  {/* Tags and Severity */}
+                  <div className="flex items-center space-x-2 mb-3">
+                    <Badge variant="outline" className="border-slate-300 dark:border-slate-600">
+                      {post.category}
+                    </Badge>
+                    <Badge className={getSeverityColor(post.severity)}>
+                      <AlertTriangle className="h-3 w-3 mr-1" />
+                      {getSeverityLabel(post.severity)} ({post.severity}/10)
+                    </Badge>
                   </div>
-                )}
-              </div>
 
-              {/* Post Actions */}
-              <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
-                <div className="flex items-center space-x-4">
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => handleVote(post.id, 'up')}
-                    className="hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
-                  >
-                    <ThumbsUp className="h-4 w-4 mr-1" />
-                    {post.upvotes}
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    onClick={() => handleVote(post.id, 'down')}
-                    className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
-                  >
-                    <ThumbsDown className="h-4 w-4 mr-1" />
-                    {post.downvotes}
-                  </Button>
-                  <Button 
-                    variant="ghost" 
-                    size="sm"
-                    className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
-                  >
-                    <MessageCircle className="h-4 w-4 mr-1" />
-                    {post.comments}
-                  </Button>
+                  {/* Similar Posts */}
+                  {post.similar_posts > 0 && (
+                    <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-3 mb-3">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-amber-700 dark:text-amber-300">
+                          {post.similar_posts} similar report{post.similar_posts > 1 ? 's' : ''} found in this area
+                        </span>
+                        <Button variant="link" className="text-amber-700 dark:text-amber-300 p-0 h-auto">
+                          View All
+                        </Button>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+
+                {/* Post Actions */}
+                <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
+                  <div className="flex items-center space-x-4">
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleVote(post.id, 'up')}
+                      className="hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                    >
+                      <ThumbsUp className="h-4 w-4 mr-1" />
+                      {post.upvotes}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      onClick={() => handleVote(post.id, 'down')}
+                      className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                    >
+                      <ThumbsDown className="h-4 w-4 mr-1" />
+                      {post.downvotes}
+                    </Button>
+                    <Button 
+                      variant="ghost" 
+                      size="sm"
+                      className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                    >
+                      <MessageCircle className="h-4 w-4 mr-1" />
+                      {post.comments}
+                    </Button>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))
+        )}
       </div>
     </div>
   );
