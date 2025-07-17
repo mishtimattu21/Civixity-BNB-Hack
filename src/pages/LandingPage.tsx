@@ -19,12 +19,36 @@ import {
   Star,
   Quote
 } from "lucide-react";
+import { supabase } from '@/lib/supabaseClient';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+
+// Google sign-in
+export const signInWithGoogle = async () => {
+  const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+  if (error) alert(error.message);
+};
+
+// Sign out
+export const signOut = async () => {
+  const { error } = await supabase.auth.signOut();
+  if (error) alert(error.message);
+};
 
 const LandingPage = () => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [impactStats, setImpactStats] = useState({ reports: 0, resolved: 0, points: 0, users: 0 });
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+    // Check on mount
+    supabase.auth.getUser().then(({ data }) => setUser(data?.user ?? null));
+    return () => listener?.subscription.unsubscribe();
+  }, []);
 
   // Animated counters
   useEffect(() => {
@@ -110,6 +134,11 @@ const LandingPage = () => {
     setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
   };
 
+  const handleChangeAccount = async () => {
+    await signOut();
+    signInWithGoogle(); // or show your sign-in UI/modal
+  };
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
       {/* Navigation */}
@@ -137,8 +166,34 @@ const LandingPage = () => {
                 onClick={() => navigate("/platform")}
                 className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
               >
-                Sign In
+                Get Started
               </Button>
+              {user ? (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="p-0 rounded-full">
+                      {user.user_metadata?.avatar_url ? (
+                        <img src={user.user_metadata.avatar_url} alt="avatar" className="w-8 h-8 rounded-full object-cover" />
+                      ) : (
+                        <span className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-lg">
+                          {user.email ? user.email[0].toUpperCase() : '?'}
+                        </span>
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuItem onClick={handleChangeAccount}>Change Account</DropdownMenuItem>
+                    <DropdownMenuItem onClick={signOut}>Sign Out</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              ) : (
+                <Button
+                  onClick={signInWithGoogle}
+                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                >
+                  Sign In
+                </Button>
+              )}
             </div>
           </div>
         </div>
