@@ -21,6 +21,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
+import { useToast } from "@/hooks/use-toast";
+import { formatDistanceToNow, parseISO } from "date-fns";
 
 const HomePage = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -63,6 +65,18 @@ const HomePage = () => {
     image: null as File | null
   });
   const [uploading, setUploading] = useState(false);
+  const { toast } = useToast();
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  // Track user votes per post in localStorage
+  const [userVotes, setUserVotes] = useState<{ [postId: number]: 'up' | 'down' | null }>({});
+
+  useEffect(() => {
+    const storedVotes = localStorage.getItem('userVotes');
+    if (storedVotes) {
+      setUserVotes(JSON.parse(storedVotes));
+    }
+  }, []);
 
   // Fetch posts from Supabase on mount
   useEffect(() => {
@@ -98,11 +112,17 @@ const HomePage = () => {
       const { data: storageData, error: storageError } = await supabase.storage
         .from('post-images')
         .upload(fileName, newPost.image);
+      if (storageError) {
+        alert('Image upload failed: ' + storageError.message);
+      }
       if (!storageError && storageData) {
         const { data: publicUrlData } = supabase.storage
           .from('post-images')
           .getPublicUrl(storageData.path);
         imageUrl = publicUrlData.publicUrl;
+        if (!imageUrl) {
+          imageUrl = `https://xehqydqnqzxbspsxwdff.supabase.co/storage/v1/object/public/post-images/${storageData.path}`;
+        }
       }
     }
     // Insert post into Supabase
@@ -126,6 +146,8 @@ const HomePage = () => {
     setUploading(false);
     if (!insertError) {
       setNewPost({ title: "", description: "", image: null });
+      setDialogOpen(false);
+      toast({ title: "Posted!", description: "Your report has been submitted." });
       // Refetch posts
       const { data, error } = await supabase
         .from('posts')
@@ -134,19 +156,30 @@ const HomePage = () => {
       if (!error && data) {
         setPosts(data);
       }
+    } else {
+      alert('Post creation failed: ' + insertError.message);
     }
   };
 
   const handleVote = (postId: number, type: 'up' | 'down') => {
-    setPosts(posts.map(post => 
-      post.id === postId 
-        ? { 
-            ...post, 
-            upvotes: type === 'up' ? post.upvotes + 1 : post.upvotes,
-            downvotes: type === 'down' ? post.downvotes + 1 : post.downvotes
-          }
-        : post
-    ));
+    const prevVote = userVotes[postId];
+    if (prevVote === type) return; // Already voted this way
+    setPosts(posts.map(post => {
+      if (post.id !== postId) return post;
+      let upvotes = post.upvotes;
+      let downvotes = post.downvotes;
+      if (type === 'up') {
+        upvotes += 1;
+        if (prevVote === 'down') downvotes = Math.max(0, downvotes - 1);
+      } else if (type === 'down') {
+        downvotes += 1;
+        if (prevVote === 'up') upvotes = Math.max(0, upvotes - 1);
+      }
+      return { ...post, upvotes, downvotes };
+    }));
+    const newVotes = { ...userVotes, [postId]: type };
+    setUserVotes(newVotes);
+    localStorage.setItem('userVotes', JSON.stringify(newVotes));
   };
 
   const getSeverityColor = (severity: number) => {
@@ -198,7 +231,7 @@ const HomePage = () => {
       </Card>
 
       {/* Create New Post */}
-      <Dialog>
+      <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
           <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-md transition-shadow">
             <CardContent className="p-4">
@@ -275,7 +308,7 @@ const HomePage = () => {
                       <div className="font-medium text-slate-900 dark:text-white">{post.author}</div>
                       <div className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
                         <Clock className="h-3 w-3" />
-                        <span>{post.timestamp}</span>
+                        <span>{post.timestamp ? formatDistanceToNow(parseISO(post.timestamp), { addSuffix: true }) : ''}</span>
                         <MapPin className="h-3 w-3 ml-2" />
                         <span>{post.location}</span>
                       </div>
@@ -296,9 +329,14 @@ const HomePage = () => {
                   <p className="text-slate-600 dark:text-slate-300 mb-3">
                     {post.description}
                   </p>
-                  {post.image_url && (
-                    <img src={post.image_url} alt="Post" className="mb-3 rounded-lg max-h-60 w-full object-cover" />
-                  )}
+                  {post.image_url && post.image_url !== 'null' && post.image_url !== '' ? (
+                    <img
+                      src={post.image_url}
+                      alt="Post"
+                      className="mb-3 rounded-lg"
+                      style={{ maxWidth: '100%', maxHeight: 350, width: 'auto', height: 'auto', objectFit: 'contain', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                    />
+                  ) : null}
                   
                   {/* Tags and Severity */}
                   <div className="flex items-center space-x-2 mb-3">
@@ -334,6 +372,7 @@ const HomePage = () => {
                       size="sm"
                       onClick={() => handleVote(post.id, 'up')}
                       className="hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                      disabled={userVotes[post.id] === 'up'}
                     >
                       <ThumbsUp className="h-4 w-4 mr-1" />
                       {post.upvotes}
@@ -343,6 +382,7 @@ const HomePage = () => {
                       size="sm"
                       onClick={() => handleVote(post.id, 'down')}
                       className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                      disabled={userVotes[post.id] === 'down'}
                     >
                       <ThumbsDown className="h-4 w-4 mr-1" />
                       {post.downvotes}
