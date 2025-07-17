@@ -1,0 +1,374 @@
+
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
+import { useTheme } from "@/components/theme-provider";
+import { useNavigate } from "react-router-dom";
+import { 
+  Moon, 
+  Sun, 
+  Brain, 
+  Shield, 
+  Users, 
+  TrendingUp, 
+  MapPin, 
+  Coins,
+  ChevronLeft,
+  ChevronRight,
+  Star,
+  Quote
+} from "lucide-react";
+
+const LandingPage = () => {
+  const { theme, setTheme } = useTheme();
+  const navigate = useNavigate();
+  const [currentTestimonial, setCurrentTestimonial] = useState(0);
+  const [impactStats, setImpactStats] = useState({ reports: 0, resolved: 0, points: 0, users: 0 });
+
+  // Animated counters
+  useEffect(() => {
+    const targets = { reports: 12543, resolved: 9876, points: 45231, users: 2854 };
+    const duration = 2000;
+    const increment = 50;
+
+    Object.keys(targets).forEach((key) => {
+      const target = targets[key as keyof typeof targets];
+      const step = target / (duration / increment);
+      let current = 0;
+
+      const timer = setInterval(() => {
+        current += step;
+        if (current >= target) {
+          current = target;
+          clearInterval(timer);
+        }
+        setImpactStats(prev => ({ ...prev, [key]: Math.floor(current) }));
+      }, increment);
+    });
+  }, []);
+
+  const features = [
+    {
+      icon: Brain,
+      title: "AI-Powered Detection",
+      description: "Smart categorization and severity scoring of civic issues using advanced AI algorithms."
+    },
+    {
+      icon: Shield,
+      title: "Blockchain Rewards",
+      description: "Earn CIVI tokens for civic participation and redeem for real-world benefits."
+    },
+    {
+      icon: Users,
+      title: "Community DAO",
+      description: "Democratic voting system for prioritizing and funding civic improvement projects."
+    },
+    {
+      icon: TrendingUp,
+      title: "Real-time Analytics",
+      description: "Interactive heatmaps and insights showing civic health across your city."
+    },
+    {
+      icon: MapPin,
+      title: "GeoNFT Locations",
+      description: "Unique location-based NFTs that track the history and improvements of civic spaces."
+    },
+    {
+      icon: Coins,
+      title: "Points Economy",
+      description: "Gamified civic engagement with achievements, badges, and reward redemption."
+    }
+  ];
+
+  const testimonials = [
+    {
+      name: "Sarah Chen",
+      role: "Community Leader",
+      content: "Civixity transformed how our neighborhood tackles local issues. The AI detection is incredibly accurate!",
+      rating: 5
+    },
+    {
+      name: "Marcus Johnson", 
+      role: "City Volunteer",
+      content: "I've earned over 500 CIVI tokens just by reporting potholes and attending community events.",
+      rating: 5
+    },
+    {
+      name: "Dr. Priya Patel",
+      role: "Urban Planner",
+      content: "The heatmap insights help us understand civic needs better than any traditional system.",
+      rating: 5
+    }
+  ];
+
+  const nextTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
+  };
+
+  const prevTestimonial = () => {
+    setCurrentTestimonial((prev) => (prev - 1 + testimonials.length) % testimonials.length);
+  };
+
+  return (
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
+      {/* Navigation */}
+      <nav className="sticky top-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-700">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center h-16">
+            <div className="flex items-center space-x-2">
+              <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">C</span>
+              </div>
+              <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
+                Civixity
+              </span>
+            </div>
+            
+            <div className="flex items-center space-x-4">
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setTheme(theme === "light" ? "dark" : "light")}
+              >
+                {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
+              </Button>
+              <Button 
+                onClick={() => navigate("/platform")}
+                className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
+              >
+                Get Started
+              </Button>
+            </div>
+          </div>
+        </div>
+      </nav>
+
+      {/* Hero Section */}
+      <section className="relative py-20 lg:py-32 overflow-hidden">
+        <div className="absolute inset-0 bg-grid-slate-100 dark:bg-grid-slate-700/25 bg-[size:20px_20px] opacity-60"></div>
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center">
+            <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+              <span className="bg-gradient-to-r from-teal-600 via-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Empower Your
+              </span>
+              <br />
+              <span className="text-slate-900 dark:text-white">
+                Neighborhood
+              </span>
+              <br />
+              <span className="text-2xl md:text-3xl lg:text-4xl font-medium text-slate-600 dark:text-slate-300">
+                One Report at a Time
+              </span>
+            </h1>
+            
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-8">
+              Join the future of civic engagement with AI-powered issue reporting, 
+              blockchain rewards, and community-driven solutions.
+            </p>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                size="lg"
+                onClick={() => navigate("/platform")}
+                className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-lg px-8 py-3"
+              >
+                Start Reporting Issues
+              </Button>
+              <Button 
+                size="lg" 
+                variant="outline"
+                className="text-lg px-8 py-3 border-slate-300 dark:border-slate-600"
+              >
+                Watch Demo
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Impact Stats */}
+      <section className="py-16 bg-white/50 dark:bg-slate-800/50 backdrop-blur-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-teal-600 dark:text-teal-400">
+                {impactStats.reports.toLocaleString()}
+              </div>
+              <div className="text-slate-600 dark:text-slate-300 mt-1">Issues Reported</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-blue-600 dark:text-blue-400">
+                {impactStats.resolved.toLocaleString()}
+              </div>
+              <div className="text-slate-600 dark:text-slate-300 mt-1">Issues Resolved</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-purple-600 dark:text-purple-400">
+                {impactStats.points.toLocaleString()}
+              </div>
+              <div className="text-slate-600 dark:text-slate-300 mt-1">CIVI Tokens Earned</div>
+            </div>
+            <div className="text-center">
+              <div className="text-3xl md:text-4xl font-bold text-emerald-600 dark:text-emerald-400">
+                {impactStats.users.toLocaleString()}
+              </div>
+              <div className="text-slate-600 dark:text-slate-300 mt-1">Active Citizens</div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* Features Grid */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              Revolutionary Civic Technology
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+              Combining AI, blockchain, and community power to transform how cities work
+            </p>
+          </div>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {features.map((feature, index) => (
+              <Card key={index} className="group hover:shadow-xl transition-all duration-300 border-slate-200 dark:border-slate-700 bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm">
+                <CardContent className="p-6">
+                  <div className="w-12 h-12 bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
+                    <feature.icon className="h-6 w-6 text-white" />
+                  </div>
+                  <h3 className="text-xl font-semibold text-slate-900 dark:text-white mb-2">
+                    {feature.title}
+                  </h3>
+                  <p className="text-slate-600 dark:text-slate-300">
+                    {feature.description}
+                  </p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-20 bg-gradient-to-r from-teal-50 to-blue-50 dark:from-slate-800 dark:to-slate-900">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+              What Citizens Say
+            </h2>
+            <p className="text-xl text-slate-600 dark:text-slate-300">
+              Real stories from engaged community members
+            </p>
+          </div>
+          
+          <div className="relative">
+            <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200 dark:border-slate-700">
+              <CardContent className="p-8">
+                <div className="text-center">
+                  <Quote className="h-8 w-8 text-teal-500 mx-auto mb-4" />
+                  <p className="text-lg text-slate-700 dark:text-slate-300 mb-6 italic">
+                    "{testimonials[currentTestimonial].content}"
+                  </p>
+                  <div className="flex justify-center mb-4">
+                    {[...Array(testimonials[currentTestimonial].rating)].map((_, i) => (
+                      <Star key={i} className="h-5 w-5 text-yellow-400 fill-current" />
+                    ))}
+                  </div>
+                  <div>
+                    <div className="font-semibold text-slate-900 dark:text-white">
+                      {testimonials[currentTestimonial].name}
+                    </div>
+                    <div className="text-slate-600 dark:text-slate-400">
+                      {testimonials[currentTestimonial].role}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={prevTestimonial}
+              className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 bg-white dark:bg-slate-800"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </Button>
+            <Button 
+              variant="outline" 
+              size="icon"
+              onClick={nextTestimonial}
+              className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 bg-white dark:bg-slate-800"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </Button>
+          </div>
+          
+          <div className="flex justify-center mt-8 space-x-2">
+            {testimonials.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => setCurrentTestimonial(index)}
+                className={`w-3 h-3 rounded-full transition-colors ${
+                  index === currentTestimonial 
+                    ? 'bg-teal-500' 
+                    : 'bg-slate-300 dark:bg-slate-600'
+                }`}
+              />
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Footer */}
+      <section className="py-20 bg-gradient-to-r from-teal-600 to-blue-600 text-white">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <h2 className="text-3xl md:text-4xl font-bold mb-4">
+            Ready to Transform Your Community?
+          </h2>
+          <p className="text-xl text-teal-100 mb-8">
+            Join thousands of citizens making their neighborhoods better, one report at a time.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button 
+              size="lg"
+              onClick={() => navigate("/platform")}
+              className="bg-white text-teal-600 hover:bg-slate-100 text-lg px-8 py-3"
+            >
+              Start Now - It's Free
+            </Button>
+            <Button 
+              size="lg" 
+              variant="outline"
+              className="border-white text-white hover:bg-white hover:text-teal-600 text-lg px-8 py-3"
+            >
+              Learn More
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {/* Footer */}
+      <footer className="bg-slate-900 text-white py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-center">
+            <div className="flex items-center space-x-2 mb-4 md:mb-0">
+              <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white font-bold text-sm">C</span>
+              </div>
+              <span className="text-xl font-bold">Civixity</span>
+            </div>
+            <div className="text-slate-400">
+              © 2024 Civixity. Empowering communities through technology.
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
+  );
+};
+
+export default LandingPage;
