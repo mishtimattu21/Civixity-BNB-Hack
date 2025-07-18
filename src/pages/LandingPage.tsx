@@ -51,13 +51,17 @@ const LandingPage = () => {
   const [error, setError] = useState('');
   const [username, setUsername] = useState('');
   const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [authChecked, setAuthChecked] = useState(false);
 
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
       setUser(session?.user ?? null);
+      setAuthChecked(true);
     });
-    // Check on mount
-    supabase.auth.getUser().then(({ data }) => setUser(data?.user ?? null));
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user ?? null);
+      setAuthChecked(true);
+    });
     return () => listener?.subscription.unsubscribe();
   }, []);
 
@@ -335,7 +339,13 @@ const LandingPage = () => {
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
               <Button 
                 size="lg"
-                onClick={() => navigate("/platform")}
+                onClick={() => {
+                  if (user) {
+                    navigate("/platform");
+                  } else {
+                    setSignInOpen(true);
+                  }
+                }}
                 className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-lg px-8 py-3"
               >
                 Start Reporting Issues
