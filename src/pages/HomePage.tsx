@@ -132,6 +132,55 @@ const HomePage = () => {
     }
   };
 
+  const [user, setUser] = useState<any>(null);
+  const [username, setUsername] = useState<string | null>(null);
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
+  const [newUsername, setNewUsername] = useState('');
+  const [usernameError, setUsernameError] = useState('');
+  const [postAnonymous, setPostAnonymous] = useState(false);
+
+  // Fetch user and username after login
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      setUser(data?.user ?? null);
+      if (data?.user) {
+        supabase
+          .from('profiles')
+          .select('username')
+          .eq('id', data.user.id)
+          .single()
+          .then(({ data: profile }) => {
+            if (!profile?.username) setShowUsernameModal(true);
+            else setUsername(profile.username);
+          });
+      }
+    });
+  }, []);
+
+  // Handle username creation
+  const handleSetUsername = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setUsernameError('');
+    // Check uniqueness
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', newUsername)
+      .single();
+    if (existing) {
+      setUsernameError('Username already taken');
+      return;
+    }
+    // Save to profiles
+    if (user) {
+      await supabase
+        .from('profiles')
+        .upsert({ id: user.id, username: newUsername });
+      setUsername(newUsername);
+      setShowUsernameModal(false);
+    }
+  };
+
   // Handle new post submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,12 +207,15 @@ const HomePage = () => {
     }
     // Determine final category
     const finalCategory = newPost.category === 'Other' && newPost.otherCategory.trim() ? `Other: ${newPost.otherCategory.trim()}` : newPost.category;
+    // Determine username for post
+    const postUsername = postAnonymous ? 'Anonymous' : username;
     // Insert post into Supabase
     const { error: insertError } = await supabase.from('posts').insert([
       {
         title: newPost.title,
         description: newPost.description,
-        author: "Anonymous", // Replace with user info if using Auth
+        author: postUsername,
+        user_id: postAnonymous ? null : user?.id,
         timestamp: new Date().toISOString(),
         location: newPost.location,
         category: finalCategory,
@@ -180,6 +232,7 @@ const HomePage = () => {
     if (!insertError) {
       setNewPost({ title: "", description: "", image: null, location: "", autoDetectLocation: false, category: "Potholes", otherCategory: "" });
       setDialogOpen(false);
+      setPostAnonymous(false);
       toast({ title: "Posted!", description: "Your report has been submitted." });
       // Refetch posts
       const { data, error } = await supabase
@@ -457,9 +510,37 @@ const HomePage = () => {
                 <Input type="file" accept="image/*" id="image" onChange={handleImageChange} />
               </div>
             </div>
+            <div className="flex items-center space-x-2">
+              <input
+                type="checkbox"
+                id="postAnonymous"
+                checked={postAnonymous}
+                onChange={e => setPostAnonymous(e.target.checked)}
+                className="mr-2"
+              />
+              <Label htmlFor="postAnonymous">Post as anonymous</Label>
+            </div>
             <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600" type="submit" disabled={uploading}>
               {uploading ? 'Submitting...' : 'Submit Report'}
             </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* Username modal */}
+      <Dialog open={showUsernameModal}>
+        <DialogContent>
+          <form onSubmit={handleSetUsername} className="space-y-4">
+            <Label htmlFor="newUsername">Choose a unique username</Label>
+            <Input
+              id="newUsername"
+              value={newUsername}
+              onChange={e => setNewUsername(e.target.value)}
+              placeholder="Username"
+              required
+            />
+            {usernameError && <div className="text-red-500 text-sm">{usernameError}</div>}
+            <Button type="submit" className="w-full bg-gradient-to-r from-teal-500 to-blue-600">Set Username</Button>
           </form>
         </DialogContent>
       </Dialog>

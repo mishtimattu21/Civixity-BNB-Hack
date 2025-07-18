@@ -21,6 +21,10 @@ import {
 } from "lucide-react";
 import { supabase } from '@/lib/supabaseClient';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuItem } from '@/components/ui/dropdown-menu';
+import { Auth } from '@supabase/auth-ui-react'
+import { ThemeSupa } from '@supabase/auth-ui-shared'
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 // Google sign-in
 export const signInWithGoogle = async () => {
@@ -40,6 +44,13 @@ const LandingPage = () => {
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
   const [impactStats, setImpactStats] = useState({ reports: 0, resolved: 0, points: 0, users: 0 });
   const [user, setUser] = useState(null);
+  const [signInOpen, setSignInOpen] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const [username, setUsername] = useState('');
+  const [showUsernameModal, setShowUsernameModal] = useState(false);
 
   useEffect(() => {
     const { data: listener } = supabase.auth.onAuthStateChange((_event, session) => {
@@ -49,6 +60,21 @@ const LandingPage = () => {
     supabase.auth.getUser().then(({ data }) => setUser(data?.user ?? null));
     return () => listener?.subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    if (user) {
+      // Fetch profile
+      supabase
+        .from('profiles')
+        .select('username')
+        .eq('id', user.id)
+        .single()
+        .then(({ data }) => {
+          if (!data?.username) setShowUsernameModal(true);
+          else setUsername(data.username);
+        });
+    }
+  }, [user]);
 
   // Animated counters
   useEffect(() => {
@@ -136,7 +162,47 @@ const LandingPage = () => {
 
   const handleChangeAccount = async () => {
     await signOut();
-    signInWithGoogle(); // or show your sign-in UI/modal
+    setSignInOpen(true); // Show the sign-in modal
+  };
+
+  // Handler for email sign-in
+  const handleEmailSignIn = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    setError('');
+    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    setLoading(false);
+    if (error) setError(error.message);
+    else setSignInOpen(false);
+  };
+
+  // Handler for Google sign-in
+  const handleGoogleSignIn = async () => {
+    setLoading(true);
+    setError('');
+    const { error } = await supabase.auth.signInWithOAuth({ provider: 'google' });
+    setLoading(false);
+    if (error) setError(error.message);
+    // No need to close modal, as redirect will happen
+  };
+
+  const handleSetUsername = async (e) => {
+    e.preventDefault();
+    // Check uniqueness
+    const { data: existing } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('username', username)
+      .single();
+    if (existing) {
+      setError('Username already taken');
+      return;
+    }
+    // Save to profiles
+    await supabase
+      .from('profiles')
+      .upsert({ id: user.id, username });
+    setShowUsernameModal(false);
   };
 
   return (
@@ -162,12 +228,6 @@ const LandingPage = () => {
               >
                 {theme === "light" ? <Moon className="h-4 w-4" /> : <Sun className="h-4 w-4" />}
               </Button>
-              <Button 
-                onClick={() => navigate("/platform")}
-                className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
-              >
-                Get Started
-              </Button>
               {user ? (
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
@@ -187,12 +247,61 @@ const LandingPage = () => {
                   </DropdownMenuContent>
                 </DropdownMenu>
               ) : (
-                <Button
-                  onClick={signInWithGoogle}
-                  className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
-                >
-                  Sign In
-                </Button>
+                <Dialog open={signInOpen} onOpenChange={setSignInOpen}>
+                  <DialogTrigger asChild>
+                    <Button
+                      onClick={() => setSignInOpen(true)}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white"
+                    >
+                      Sign In
+                    </Button>
+                  </DialogTrigger>
+                  <DialogContent className="max-w-md bg-white dark:bg-slate-800">
+                    <DialogHeader>
+                      <DialogTitle className="text-slate-900 dark:text-white">Sign In</DialogTitle>
+                    </DialogHeader>
+                    <form onSubmit={handleEmailSignIn} className="space-y-4">
+                      <Input
+                        type="email"
+                        placeholder="Email"
+                        value={email}
+                        onChange={e => setEmail(e.target.value)}
+                        className="bg-white dark:bg-slate-700"
+                        required
+                      />
+                      <Input
+                        type="password"
+                        placeholder="Password"
+                        value={password}
+                        onChange={e => setPassword(e.target.value)}
+                        className="bg-white dark:bg-slate-700"
+                        required
+                      />
+                      {error && <div className="text-red-500 text-sm">{error}</div>}
+                      <Button
+                        type="submit"
+                        className="w-full bg-gradient-to-r from-teal-500 to-blue-600"
+                        disabled={loading}
+                      >
+                        {loading ? 'Signing In...' : 'Sign In with Email'}
+                      </Button>
+                    </form>
+                    <div className="flex items-center my-4">
+                      <div className="flex-1 border-t border-slate-300 dark:border-slate-600"></div>
+                      <span className="mx-2 text-slate-400 dark:text-slate-500 text-xs">OR</span>
+                      <div className="flex-1 border-t border-slate-300 dark:border-slate-600"></div>
+                    </div>
+                    <Button
+                      onClick={handleGoogleSignIn}
+                      className="w-full bg-white dark:bg-slate-700 border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-white flex items-center justify-center"
+                      disabled={loading}
+                      type="button"
+                    >
+                      <svg className="h-5 w-5 mr-2" /* Google icon SVG here */ />
+                      Sign In with Google
+                    </Button>
+                  </DialogContent>
+                </Dialog>
               )}
             </div>
           </div>
@@ -422,6 +531,26 @@ const LandingPage = () => {
           </div>
         </div>
       </footer>
+
+      {user && (
+        <Dialog open={showUsernameModal} onOpenChange={setShowUsernameModal}>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle className="text-slate-900 dark:text-white">Choose a Unique Username</DialogTitle>
+            </DialogHeader>
+            <form onSubmit={handleSetUsername} className="space-y-4">
+              <Input
+                value={username}
+                onChange={e => setUsername(e.target.value)}
+                placeholder="Choose a unique username"
+                required
+              />
+              <Button type="submit">Set Username</Button>
+            </form>
+            {error && <div className="text-red-500">{error}</div>}
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 };
