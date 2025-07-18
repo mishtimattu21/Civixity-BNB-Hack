@@ -37,7 +37,8 @@ const Heatmaps = () => {
     { id: "garbage", label: "Garbage", color: "#F59E0B" },
     { id: "lighting", label: "Street Lighting", color: "#8B5CF6" },
     { id: "water", label: "Water Issues", color: "#06B6D4" },
-    { id: "safety", label: "Public Safety", color: "#10B981" }
+    { id: "safety", label: "Public Safety", color: "#10B981" },
+    { id: "others", label: "Others", color: "#64748B" }
   ];
 
   const departmentData = [
@@ -100,9 +101,9 @@ const Heatmaps = () => {
                 <span>City Heatmap</span>
               </CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="flex flex-col h-[420px] p-0">
               {/* Map Layer Controls */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className="flex flex-wrap gap-2 mb-4 p-4 pb-0">
                 {mapLayers.map((layer) => (
                   <Button
                     key={layer.id}
@@ -125,8 +126,8 @@ const Heatmaps = () => {
               </div>
 
               {/* Mock Heatmap Display */}
-              <div className="bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-lg p-8 text-center relative overflow-hidden">
-                <div className="relative z-10">
+              <div className="flex-1 w-full min-h-[300px] flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-b-lg">
+                <div className="relative z-10 text-center">
                   <Map className="h-16 w-16 text-slate-400 mx-auto mb-4" />
                   <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-2">
                     Interactive City Map
@@ -139,9 +140,8 @@ const Heatmaps = () => {
                     {selectedLayer === "all" ? "All Layers" : "Filtered View"}
                   </Badge>
                 </div>
-                
                 {/* Mock heat zones */}
-                <div className="absolute inset-4 opacity-30">
+                <div className="absolute inset-4 opacity-30 pointer-events-none">
                   <div className="absolute top-1/4 left-1/3 w-12 h-12 bg-red-500 rounded-full blur-sm"></div>
                   <div className="absolute top-1/2 right-1/4 w-8 h-8 bg-yellow-500 rounded-full blur-sm"></div>
                   <div className="absolute bottom-1/3 left-1/4 w-10 h-10 bg-orange-500 rounded-full blur-sm"></div>

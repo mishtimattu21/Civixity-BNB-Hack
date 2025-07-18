@@ -1,5 +1,5 @@
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -62,7 +62,11 @@ const HomePage = () => {
   const [newPost, setNewPost] = useState({
     title: "",
     description: "",
-    image: null as File | null
+    image: null as File | null,
+    location: "",
+    autoDetectLocation: false,
+    category: "Potholes", // default value
+    otherCategory: ""
   });
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
@@ -77,6 +81,33 @@ const HomePage = () => {
       setUserVotes(JSON.parse(storedVotes));
     }
   }, []);
+
+  // Handle auto-detect location
+  useEffect(() => {
+    if (newPost.autoDetectLocation && navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          // Call Nominatim API for reverse geocoding
+          try {
+            const response = await fetch(
+              `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`
+            );
+            const data = await response.json();
+            setNewPost((prev) => ({
+              ...prev,
+              location: data.display_name || "Location unavailable"
+            }));
+          } catch (err) {
+            setNewPost((prev) => ({ ...prev, location: "Location unavailable" }));
+          }
+        },
+        (err) => {
+          setNewPost((prev) => ({ ...prev, location: "Location unavailable" }));
+        }
+      );
+    }
+  }, [newPost.autoDetectLocation]);
 
   // Fetch posts from Supabase on mount
   useEffect(() => {
@@ -125,6 +156,8 @@ const HomePage = () => {
         }
       }
     }
+    // Determine final category
+    const finalCategory = newPost.category === 'Other' && newPost.otherCategory.trim() ? `Other: ${newPost.otherCategory.trim()}` : newPost.category;
     // Insert post into Supabase
     const { error: insertError } = await supabase.from('posts').insert([
       {
@@ -132,8 +165,8 @@ const HomePage = () => {
         description: newPost.description,
         author: "Anonymous", // Replace with user info if using Auth
         timestamp: new Date().toISOString(),
-        location: "Unknown", // Optionally add location input
-        category: "General", // Optionally add category input
+        location: newPost.location,
+        category: finalCategory,
         severity: 5, // Optionally add severity input
         upvotes: 0,
         downvotes: 0,
@@ -145,7 +178,7 @@ const HomePage = () => {
     ]);
     setUploading(false);
     if (!insertError) {
-      setNewPost({ title: "", description: "", image: null });
+      setNewPost({ title: "", description: "", image: null, location: "", autoDetectLocation: false, category: "Potholes", otherCategory: "" });
       setDialogOpen(false);
       toast({ title: "Posted!", description: "Your report has been submitted." });
       // Refetch posts
@@ -161,22 +194,34 @@ const HomePage = () => {
     }
   };
 
-  const handleVote = (postId: number, type: 'up' | 'down') => {
+  const handleVote = async (postId: number, type: 'up' | 'down') => {
     const prevVote = userVotes[postId];
     if (prevVote === type) return; // Already voted this way
-    setPosts(posts.map(post => {
-      if (post.id !== postId) return post;
-      let upvotes = post.upvotes;
-      let downvotes = post.downvotes;
-      if (type === 'up') {
-        upvotes += 1;
-        if (prevVote === 'down') downvotes = Math.max(0, downvotes - 1);
-      } else if (type === 'down') {
-        downvotes += 1;
-        if (prevVote === 'up') upvotes = Math.max(0, upvotes - 1);
-      }
-      return { ...post, upvotes, downvotes };
-    }));
+
+    // Find the post
+    const post = posts.find(p => p.id === postId);
+    if (!post) return;
+
+    let upvotes = post.upvotes;
+    let downvotes = post.downvotes;
+    if (type === 'up') {
+      upvotes += 1;
+      if (prevVote === 'down') downvotes = Math.max(0, downvotes - 1);
+    } else if (type === 'down') {
+      downvotes += 1;
+      if (prevVote === 'up') upvotes = Math.max(0, upvotes - 1);
+    }
+
+    // Update in Supabase
+    await supabase
+      .from('posts')
+      .update({ upvotes, downvotes })
+      .eq('id', postId);
+
+    // Update local state
+    setPosts(posts.map(p =>
+      p.id === postId ? { ...p, upvotes, downvotes } : p
+    ));
     const newVotes = { ...userVotes, [postId]: type };
     setUserVotes(newVotes);
     localStorage.setItem('userVotes', JSON.stringify(newVotes));
@@ -194,6 +239,36 @@ const HomePage = () => {
     return "Low Priority";
   };
 
+  const categoryColors: { [key: string]: string } = {
+    "Potholes": "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300",
+    "Water Issues": "bg-cyan-100 text-cyan-700 dark:bg-cyan-900/30 dark:text-cyan-300",
+    "Street Lighting": "bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300",
+    "Garbage": "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300",
+    "Public Safety": "bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300",
+    // For custom 'Other' categories, use a default color
+    "Other": "bg-slate-200 text-slate-700 dark:bg-slate-700/30 dark:text-slate-300"
+  };
+
+  function getCategoryColor(category: string) {
+    if (category.startsWith("Other:")) return categoryColors["Other"];
+    return categoryColors[category] || "bg-slate-200 text-slate-700 dark:bg-slate-700/30 dark:text-slate-300";
+  }
+
+  // Helper to get top 5 severe posts from last 24 hours
+  const topSeverePosts = useMemo(() => {
+    const now = new Date();
+    return posts
+      .filter(post => {
+        if (!post.timestamp) return false;
+        const postTime = new Date(post.timestamp);
+        return (now.getTime() - postTime.getTime()) < 24 * 60 * 60 * 1000;
+      })
+      .sort((a, b) => b.severity - a.severity)
+      .slice(0, 5);
+  }, [posts]);
+
+  const [selectedStory, setSelectedStory] = useState<any | null>(null);
+
   return (
     <div className="max-w-4xl mx-auto space-y-6">
       {/* Stories Section */}
@@ -205,23 +280,24 @@ const HomePage = () => {
         </CardHeader>
         <CardContent>
           <div className="flex space-x-4 overflow-x-auto pb-2">
-            {stories.map((story) => (
-              <div 
-                key={story.id}
+            {topSeverePosts.map((post) => (
+              <div
+                key={post.id}
                 className="flex-shrink-0 w-32 cursor-pointer group"
+                onClick={() => setSelectedStory(post)}
               >
                 <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-full flex items-center justify-center mb-2 mx-auto group-hover:scale-105 transition-transform">
                   <MapPin className="h-8 w-8 text-teal-600 dark:text-teal-400" />
                 </div>
                 <div className="text-center">
                   <div className="text-xs font-medium text-slate-900 dark:text-white truncate">
-                    {story.title}
+                    {post.title}
                   </div>
                   <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
-                    {story.location}
+                    {post.location}
                   </div>
                   <div className="text-xs text-slate-400 dark:text-slate-500">
-                    {story.timestamp}
+                    {post.timestamp ? formatDistanceToNow(parseISO(post.timestamp), { addSuffix: true }) : ''}
                   </div>
                 </div>
               </div>
@@ -229,6 +305,58 @@ const HomePage = () => {
           </div>
         </CardContent>
       </Card>
+      {/* Story Popup Dialog */}
+      <Dialog open={!!selectedStory} onOpenChange={open => !open && setSelectedStory(null)}>
+        <DialogContent className="max-w-lg bg-white dark:bg-slate-800">
+          {selectedStory && (
+            <div>
+              <div className="flex items-center space-x-3 mb-4">
+                <Avatar>
+                  <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
+                    {selectedStory.author?.split(' ').map((n: string) => n[0]).join('')}
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="font-medium text-slate-900 dark:text-white">{selectedStory.author}</div>
+                  <div className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
+                    <Clock className="h-3 w-3" />
+                    <span>{selectedStory.timestamp ? formatDistanceToNow(parseISO(selectedStory.timestamp), { addSuffix: true }) : ''}</span>
+                    <MapPin className="h-3 w-3 ml-2" />
+                    <span>{selectedStory.location}</span>
+                  </div>
+                </div>
+              </div>
+              <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">{selectedStory.title}</h3>
+              <p className="text-slate-600 dark:text-slate-300 mb-3">{selectedStory.description}</p>
+              {selectedStory.image_url && selectedStory.image_url !== 'null' && selectedStory.image_url !== '' && (
+                <img
+                  src={selectedStory.image_url}
+                  alt="Post"
+                  className="mb-3 rounded-lg"
+                  style={{ maxWidth: '100%', maxHeight: 350, width: 'auto', height: 'auto', objectFit: 'contain', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
+                />
+              )}
+              <div className="flex items-center space-x-2 mb-3">
+                <Badge variant="outline" className={getCategoryColor(selectedStory.category)}>
+                  {selectedStory.category}
+                </Badge>
+                <Badge className={getSeverityColor(selectedStory.severity)}>
+                  <AlertTriangle className="h-3 w-3 mr-1" />
+                  {getSeverityLabel(selectedStory.severity)} ({selectedStory.severity}/10)
+                </Badge>
+              </div>
+              {/* Post Actions in Popup */}
+              <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700 mt-4">
+                <div className="flex items-center space-x-4">
+                  <span className="flex items-center text-green-600 dark:text-green-400"><ThumbsUp className="h-4 w-4 mr-1" />{selectedStory.upvotes}</span>
+                  <span className="flex items-center text-red-600 dark:text-red-400"><ThumbsDown className="h-4 w-4 mr-1" />{selectedStory.downvotes}</span>
+                  <span className="flex items-center text-blue-600 dark:text-blue-400"><MessageCircle className="h-4 w-4 mr-1" />{selectedStory.comments}</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       {/* Create New Post */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
@@ -274,6 +402,54 @@ const HomePage = () => {
                 rows={3}
                 required
               />
+            </div>
+            <div>
+              <Label htmlFor="location">Location</Label>
+              <Input
+                id="location"
+                placeholder="Enter location or use auto-detect"
+                value={newPost.location}
+                onChange={(e) => setNewPost({ ...newPost, location: e.target.value, autoDetectLocation: false })}
+                className="bg-white dark:bg-slate-700"
+                disabled={newPost.autoDetectLocation}
+              />
+              <div className="flex items-center mt-2">
+                <input
+                  type="checkbox"
+                  id="autoDetectLocation"
+                  checked={newPost.autoDetectLocation}
+                  onChange={(e) => setNewPost({ ...newPost, autoDetectLocation: e.target.checked })}
+                  className="mr-2"
+                />
+                <Label htmlFor="autoDetectLocation">Detect my location automatically</Label>
+              </div>
+            </div>
+            <div>
+              <Label htmlFor="category">Category</Label>
+              <select
+                id="category"
+                value={newPost.category}
+                onChange={e => setNewPost({ ...newPost, category: e.target.value })}
+                className="bg-white dark:bg-slate-700 w-full rounded border px-3 py-2"
+                required
+              >
+                <option value="Potholes">Potholes</option>
+                <option value="Water Issues">Water Issues</option>
+                <option value="Street Lighting">Street Lighting</option>
+                <option value="Garbage">Garbage</option>
+                <option value="Public Safety">Public Safety</option>
+                <option value="Other">Other</option>
+              </select>
+              {newPost.category === 'Other' && (
+                <Input
+                  id="otherCategory"
+                  placeholder="Please specify the issue type in 1-2 words"
+                  value={newPost.otherCategory}
+                  onChange={e => setNewPost({ ...newPost, otherCategory: e.target.value })}
+                  className="bg-white dark:bg-slate-700 mt-2"
+                  required
+                />
+              )}
             </div>
             <div>
               <Label htmlFor="image">Photo (Optional)</Label>
@@ -340,7 +516,7 @@ const HomePage = () => {
                   
                   {/* Tags and Severity */}
                   <div className="flex items-center space-x-2 mb-3">
-                    <Badge variant="outline" className="border-slate-300 dark:border-slate-600">
+                    <Badge variant="outline" className={getCategoryColor(post.category)}>
                       {post.category}
                     </Badge>
                     <Badge className={getSeverityColor(post.severity)}>
@@ -371,21 +547,40 @@ const HomePage = () => {
                       variant="ghost" 
                       size="sm"
                       onClick={() => handleVote(post.id, 'up')}
-                      className="hover:bg-green-50 dark:hover:bg-green-900/20 hover:text-green-600 dark:hover:text-green-400"
+                      className={
+                        (userVotes[post.id] === 'up'
+                          ? 'bg-green-100 border border-green-300 dark:bg-green-900/40'
+                          : 'hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/30 dark:hover:text-green-400') +
+                        ' flex items-center'
+                      }
                       disabled={userVotes[post.id] === 'up'}
                     >
-                      <ThumbsUp className="h-4 w-4 mr-1" />
-                      {post.upvotes}
+                      <ThumbsUp className={
+                        `h-4 w-4 mr-1 ${userVotes[post.id] === 'up' ? 'text-black dark:text-white' : 'text-green-600 dark:text-green-400'}`
+                      } />
+                      <span className={userVotes[post.id] === 'up' ? 'text-black dark:text-white font-bold' : 'text-green-600 dark:text-green-400'}>
+                        {post.upvotes}
+                      </span>
                     </Button>
                     <Button 
                       variant="ghost" 
                       size="sm"
                       onClick={() => handleVote(post.id, 'down')}
-                      className="hover:bg-red-50 dark:hover:bg-red-900/20 hover:text-red-600 dark:hover:text-red-400"
+                      className={
+                        (userVotes[post.id] === 'down'
+                          ? 'bg-red-100 border border-red-300 dark:bg-red-900/40'
+                          : 'hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400') +
+                        ' flex items-center'
+                      }
                       disabled={userVotes[post.id] === 'down'}
                     >
-                      <ThumbsDown className="h-4 w-4 mr-1" />
-                      {post.downvotes}
+                      <ThumbsDown className={
+                        "h-4 w-4 mr-1 " +
+                        (userVotes[post.id] === 'down' ? 'text-black dark:text-white' : 'text-red-600 dark:text-red-400')
+                      } />
+                      <span className={userVotes[post.id] === 'down' ? 'text-black dark:text-white font-bold' : 'text-red-600 dark:text-red-400'}>
+                        {post.downvotes}
+                      </span>
                     </Button>
                     <Button 
                       variant="ghost" 
