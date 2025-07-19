@@ -14,6 +14,7 @@ import Heatmaps from "./pages/Heatmaps";
 import Badges from "./pages/Badges";
 import Documents from "./pages/Documents";
 import NotFound from "./pages/NotFound";
+import Polls from "./pages/Polls";
 
 const queryClient = new QueryClient();
 
@@ -33,6 +34,7 @@ const App = () => (
               <Route path="heatmaps" element={<Heatmaps />} />
               <Route path="badges" element={<Badges />} />
               <Route path="documents" element={<Documents />} />
+              <Route path="polls" element={<Polls />} />
             </Route>
             <Route path="*" element={<NotFound />} />
           </Routes>

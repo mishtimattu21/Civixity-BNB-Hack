@@ -28,6 +28,7 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
     { icon: Map, label: "Heatmaps & Insights", path: "/platform/heatmaps" },
     { icon: Award, label: "Badges & Achievements", path: "/platform/badges" },
     { icon: FileText, label: "Documents", path: "/platform/documents" },
+    { icon: ChevronLeft, label: "Polls", path: "/platform/polls" },
   ];
 
   const isActive = (path: string) => {

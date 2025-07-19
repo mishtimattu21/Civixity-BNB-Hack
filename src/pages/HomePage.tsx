@@ -355,34 +355,58 @@ const HomePage = () => {
     const { data, error } = await supabase
       .from('comments')
       .select('*')
-      .eq('post_id', postId)
+      .eq('post_id', String(postId))
       .order('created_at', { ascending: true });
     if (!error) {
       setComments(prev => ({ ...prev, [postId]: data }));
       setCommentCounts(prev => ({ ...prev, [postId]: data.length }));
+      console.log('Fetched comments for', postId, data);
+    } else {
+      console.error('Error fetching comments:', error);
     }
   };
 
   // Fetch comments when posts are loaded
   useEffect(() => {
     posts.forEach(post => {
-      fetchComments(post.id);
+      fetchComments(String(post.id));
     });
   }, [posts]);
 
   // Add a comment
   const handleAddComment = async (postId: string) => {
     if (!newComment[postId]?.trim()) return;
+    console.log('Inserting comment for postId:', postId);
     const { error } = await supabase.from('comments').insert([{
       post_id: postId,
       user_id: user?.id,
       author: username || user?.email || 'Anonymous',
       content: newComment[postId],
     }]);
+    if (error) {
+      console.error('Insert comment error:', error);
+    }
     if (!error) {
       setNewComment(prev => ({ ...prev, [postId]: '' }));
-      fetchComments(postId);
+      await fetchComments(postId);
       setCommentCounts(prev => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
+    }
+  };
+
+  const handleDeleteComment = async (commentId: string, postId: string) => {
+    const { error } = await supabase.from('comments').delete().eq('id', commentId);
+    if (!error) {
+      setComments(prev => ({
+        ...prev,
+        [postId]: (prev[postId] || []).filter(c => c.id !== commentId)
+      }));
+      setCommentCounts(prev => ({
+        ...prev,
+        [postId]: Math.max(0, (prev[postId] || 1) - 1)
+      }));
+      toast({ title: "Deleted", description: "Your comment has been deleted." });
+    } else {
+      toast({ title: "Error", description: "Failed to delete comment." });
     }
   };
 
@@ -740,34 +764,47 @@ const HomePage = () => {
                       variant="ghost" 
                       size="sm"
                       className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
-                      onClick={() => setExpandedComments(prev => ({ ...prev, [post.id]: !prev[post.id] }))}
+                      onClick={() => setExpandedComments(prev => ({ ...prev, [String(post.id)]: !prev[String(post.id)] }))}
                     >
                       <MessageCircle className="h-4 w-4 mr-1" />
-                      {commentCounts[post.id] || 0}
+                      {commentCounts[String(post.id)] || 0}
                     </Button>
                   </div>
                 </div>
 
                 {/* Comments Section */}
-                {expandedComments[post.id] && (
+                {expandedComments[String(post.id)] && (
                   <div className="mt-4">
                     <div className="font-semibold mb-2 text-slate-700 dark:text-slate-200">Comments</div>
                     <div className="space-y-2 mb-2">
-                      {(comments[post.id] || []).map(comment => (
-                        <div key={comment.id} className="bg-slate-100 dark:bg-slate-700 rounded p-2">
-                          <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">{comment.author} • {new Date(comment.created_at).toLocaleString()}</div>
+                      {(comments[String(post.id)] || []).map(comment => (
+                        <div key={comment.id} className="bg-slate-100 dark:bg-slate-700 rounded p-2 relative">
+                          <div className="flex items-center justify-between mb-1">
+                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                              {comment.author} • {comment.created_at ? formatDistanceToNow(new Date(comment.created_at), { addSuffix: true }) : ''}
+                            </div>
+                            {comment.user_id === user?.id && (
+                              <button
+                                onClick={() => handleDeleteComment(comment.id, String(post.id))}
+                                className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors absolute top-1 right-1"
+                                title="Delete comment"
+                              >
+                                <Trash className="h-4 w-4" />
+                              </button>
+                            )}
+                          </div>
                           <div className="text-slate-900 dark:text-white">{comment.content}</div>
                         </div>
                       ))}
                     </div>
                     <div className="flex gap-2">
                       <Input
-                        value={newComment[post.id] || ''}
-                        onChange={e => setNewComment(prev => ({ ...prev, [post.id]: e.target.value }))}
+                        value={newComment[String(post.id)] || ''}
+                        onChange={e => setNewComment(prev => ({ ...prev, [String(post.id)]: e.target.value }))}
                         placeholder="Add a comment..."
                         className="flex-1"
                       />
-                      <Button onClick={() => handleAddComment(post.id)} disabled={!newComment[post.id]?.trim()}>Post</Button>
+                      <Button onClick={() => handleAddComment(String(post.id))} disabled={!newComment[String(post.id)]?.trim()}>Post</Button>
                     </div>
                   </div>
                 )}
