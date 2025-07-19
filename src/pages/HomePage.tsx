@@ -66,7 +66,9 @@ const HomePage = () => {
     location: "",
     autoDetectLocation: false,
     category: "Potholes", // default value
-    otherCategory: ""
+    otherCategory: "",
+    latitude: null,
+    longitude: null,
   });
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
@@ -96,14 +98,16 @@ const HomePage = () => {
             const data = await response.json();
             setNewPost((prev) => ({
               ...prev,
-              location: data.display_name || "Location unavailable"
+              location: data.display_name || "Location unavailable",
+              latitude,
+              longitude,
             }));
           } catch (err) {
-            setNewPost((prev) => ({ ...prev, location: "Location unavailable" }));
+            setNewPost((prev) => ({ ...prev, location: "Location unavailable", latitude, longitude }));
           }
         },
         (err) => {
-          setNewPost((prev) => ({ ...prev, location: "Location unavailable" }));
+          setNewPost((prev) => ({ ...prev, location: "Location unavailable", latitude: null, longitude: null }));
         }
       );
     }
@@ -225,12 +229,14 @@ const HomePage = () => {
         comments: 0,
         image_url: imageUrl,
         similar_posts: 0,
-        ai_detected: false
+        ai_detected: false,
+        latitude: newPost.latitude,
+        longitude: newPost.longitude,
       }
     ]);
     setUploading(false);
     if (!insertError) {
-      setNewPost({ title: "", description: "", image: null, location: "", autoDetectLocation: false, category: "Potholes", otherCategory: "" });
+      setNewPost({ title: "", description: "", image: null, location: "", autoDetectLocation: false, category: "Potholes", otherCategory: "", latitude: null, longitude: null });
       setDialogOpen(false);
       setPostAnonymous(false);
       toast({ title: "Posted!", description: "Your report has been submitted." });

@@ -1,35 +1,34 @@
-
-import { useState } from "react";
+import { useState, useEffect } from 'react';
+import { GoogleMap, LoadScript, HeatmapLayer } from '@react-google-maps/api';
+import { supabase } from '@/lib/supabaseClient';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { 
-  Map, 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown,
-  Clock,
-  CheckCircle,
-  AlertTriangle,
-  Layers
-} from "lucide-react";
-import { 
-  BarChart, 
-  Bar, 
-  XAxis, 
-  YAxis, 
-  CartesianGrid, 
-  Tooltip, 
-  ResponsiveContainer,
-  LineChart,
-  Line,
-  PieChart,
-  Pie,
-  Cell
-} from 'recharts';
+import { Map, BarChart3, TrendingUp, TrendingDown, Clock, CheckCircle, AlertTriangle, Layers } from "lucide-react";
+import { BarChart as RBarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '420px',
+};
+
+const center = { lat: 10.0, lng: 76.0 }; // Default center (e.g., Kochi)
+
+const initialHeatmapData = [];
 
 const Heatmaps = () => {
   const [selectedLayer, setSelectedLayer] = useState("all");
+  const [heatmapData, setHeatmapData] = useState(initialHeatmapData);
+  const [mapsApiLoaded, setMapsApiLoaded] = useState(false);
+  const [mapsObj, setMapsObj] = useState(null);
+  const [issueTypeData, setIssueTypeData] = useState([
+    { name: "Potholes", value: 0, color: "#EF4444" },
+    { name: "Garbage", value: 0, color: "#F59E0B" },
+    { name: "Lighting", value: 0, color: "#8B5CF6" },
+    { name: "Water", value: 0, color: "#06B6D4" },
+    { name: "Safety", value: 0, color: "#10B981" },
+    { name: "Other", value: 0, color: "#64748B" },
+  ]);
 
   const mapLayers = [
     { id: "all", label: "All Issues", color: "#3B82F6" },
@@ -47,14 +46,6 @@ const Heatmaps = () => {
     { department: "Public Works", resolved: 92, pending: 18, total: 110 },
     { department: "Electricity", resolved: 78, pending: 12, total: 90 },
     { department: "Parks & Recreation", resolved: 95, pending: 5, total: 60 }
-  ];
-
-  const issueTypeData = [
-    { name: "Potholes", value: 145, color: "#EF4444" },
-    { name: "Garbage", value: 98, color: "#F59E0B" },
-    { name: "Lighting", value: 76, color: "#8B5CF6" },
-    { name: "Water", value: 54, color: "#06B6D4" },
-    { name: "Safety", value: 32, color: "#10B981" }
   ];
 
   const trendData = [
@@ -77,6 +68,62 @@ const Heatmaps = () => {
     return "text-red-600 dark:text-red-400";
   };
 
+  // Fetch civic issue locations from Supabase
+  useEffect(() => {
+    async function fetchHeatmapData() {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('latitude, longitude, category');
+      if (error) {
+        console.error('Error fetching heatmap data:', error);
+        return;
+      }
+      const filtered = data
+        .filter(p => p.latitude && p.longitude && (selectedLayer === 'all' || p.category === selectedLayer))
+        .map(p => ({ lat: parseFloat(p.latitude), lng: parseFloat(p.longitude) }));
+      setHeatmapData(filtered);
+    }
+    fetchHeatmapData();
+  }, [selectedLayer]);
+
+  // Fetch issue type counts from Supabase
+  useEffect(() => {
+    async function fetchIssueTypeCounts() {
+      const { data, error } = await supabase
+        .from('posts')
+        .select('category');
+      if (error) {
+        console.error('Error fetching issue type data:', error);
+        return;
+      }
+      const counts = {
+        Potholes: 0,
+        Garbage: 0,
+        Lighting: 0,
+        Water: 0,
+        Safety: 0,
+        Other: 0,
+      };
+      data.forEach(post => {
+        if (post.category === 'Potholes') counts.Potholes++;
+        else if (post.category === 'Garbage') counts.Garbage++;
+        else if (post.category === 'Street Lighting') counts.Lighting++;
+        else if (post.category === 'Water Issues') counts.Water++;
+        else if (post.category === 'Public Safety') counts.Safety++;
+        else counts.Other++;
+      });
+      setIssueTypeData([
+        { name: "Potholes", value: counts.Potholes, color: "#EF4444" },
+        { name: "Garbage", value: counts.Garbage, color: "#F59E0B" },
+        { name: "Lighting", value: counts.Lighting, color: "#8B5CF6" },
+        { name: "Water", value: counts.Water, color: "#06B6D4" },
+        { name: "Safety", value: counts.Safety, color: "#10B981" },
+        { name: "Other", value: counts.Other, color: "#64748B" },
+      ]);
+    }
+    fetchIssueTypeCounts();
+  }, []);
+
   return (
     <div className="max-w-6xl mx-auto space-y-6">
       {/* Header */}
@@ -91,17 +138,17 @@ const Heatmaps = () => {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
         {/* Interactive Heatmap */}
-        <div className="lg:col-span-2">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <div className="lg:col-span-2 h-full flex flex-col">
+          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 flex-1 flex flex-col">
             <CardHeader>
               <CardTitle className="flex items-center space-x-2 text-slate-900 dark:text-white">
                 <Map className="h-5 w-5" />
                 <span>City Heatmap</span>
               </CardTitle>
             </CardHeader>
-            <CardContent className="flex flex-col h-[420px] p-0">
+            <CardContent className="flex-1 flex flex-col p-0">
               {/* Map Layer Controls */}
               <div className="flex flex-wrap gap-2 mb-4 p-4 pb-0">
                 {mapLayers.map((layer) => (
@@ -124,29 +171,25 @@ const Heatmaps = () => {
                   </Button>
                 ))}
               </div>
-
-              {/* Mock Heatmap Display */}
-              <div className="flex-1 w-full min-h-[300px] flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-b-lg">
-                <div className="relative z-10 text-center">
-                  <Map className="h-16 w-16 text-slate-400 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-slate-700 dark:text-slate-300 mb-2">
-                    Interactive City Map
-                  </h3>
-                  <p className="text-slate-500 dark:text-slate-400 mb-4">
-                    Showing {mapLayers.find(l => l.id === selectedLayer)?.label.toLowerCase()} across the city
-                  </p>
-                  <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                    <Layers className="h-3 w-3 mr-1" />
-                    {selectedLayer === "all" ? "All Layers" : "Filtered View"}
-                  </Badge>
-                </div>
-                {/* Mock heat zones */}
-                <div className="absolute inset-4 opacity-30 pointer-events-none">
-                  <div className="absolute top-1/4 left-1/3 w-12 h-12 bg-red-500 rounded-full blur-sm"></div>
-                  <div className="absolute top-1/2 right-1/4 w-8 h-8 bg-yellow-500 rounded-full blur-sm"></div>
-                  <div className="absolute bottom-1/3 left-1/4 w-10 h-10 bg-orange-500 rounded-full blur-sm"></div>
-                  <div className="absolute top-1/3 right-1/3 w-6 h-6 bg-purple-500 rounded-full blur-sm"></div>
-                </div>
+              {/* Google Maps Heatmap */}
+              <div className="flex-1 w-full h-full relative rounded-b-lg overflow-hidden">
+                <LoadScript googleMapsApiKey={import.meta.env.VITE_GOOGLE_MAPS_API_KEY} libraries={['visualization']}>
+                  <GoogleMap
+                    mapContainerStyle={{ width: '100%', height: '100%' }}
+                    center={center}
+                    zoom={12}
+                    onLoad={map => {
+                      setMapsApiLoaded(true);
+                      setMapsObj(window.google.maps);
+                    }}
+                  >
+                    {mapsApiLoaded && mapsObj && (
+                      <HeatmapLayer
+                        data={heatmapData.map(p => new mapsObj.LatLng(p.lat, p.lng))}
+                      />
+                    )}
+                  </GoogleMap>
+                </LoadScript>
               </div>
             </CardContent>
           </Card>
