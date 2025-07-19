@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,6 +10,8 @@ import {
   Bot,
   User
 } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
+import ReactMarkdown from 'react-markdown';
 
 const ChatBot = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -17,18 +19,79 @@ const ChatBot = () => {
     {
       id: 1,
       type: "bot",
-      content: "Hi! I'm your civic assistant. How can I help you today?",
+      content: "Hi! I'm your civic assistant powered by AI. I can help you with information about civic issues, events, and community engagement. How can I help you today?",
       timestamp: new Date()
     }
   ]);
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
+  const [user, setUser] = useState(null);
+  const [chatWidth, setChatWidth] = useState(320); // px, initial width
+  const [chatHeight, setChatHeight] = useState(384); // px, initial height (24rem)
+  const [isResizing, setIsResizing] = useState(false);
+  const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
+  const [resizeDirection, setResizeDirection] = useState(null);
+
+  // Get current user on component mount
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
+
+  const startResize = (e, direction) => {
+    e.preventDefault();
+    setIsResizing(true);
+    setResizeDirection(direction);
+    setResizeStart({
+      x: e.clientX,
+      y: e.clientY,
+      width: chatWidth,
+      height: chatHeight,
+    });
+  };
+
+  useEffect(() => {
+    if (!isResizing || !resizeDirection) return;
+    const handleMouseMove = (e) => {
+      let newWidth = chatWidth;
+      let newHeight = chatHeight;
+      if (resizeDirection.includes('right')) {
+        newWidth = Math.max(280, resizeStart.width + (e.clientX - resizeStart.x));
+      }
+      if (resizeDirection.includes('left')) {
+        newWidth = Math.max(280, resizeStart.width - (e.clientX - resizeStart.x));
+      }
+      if (resizeDirection.includes('bottom')) {
+        newHeight = Math.max(320, resizeStart.height + (e.clientY - resizeStart.y));
+      }
+      if (resizeDirection.includes('top')) {
+        newHeight = Math.max(320, resizeStart.height - (e.clientY - resizeStart.y));
+      }
+      setChatWidth(newWidth);
+      setChatHeight(newHeight);
+    };
+    const handleMouseUp = () => {
+      setIsResizing(false);
+      setResizeDirection(null);
+    };
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizing, resizeDirection, resizeStart, chatWidth, chatHeight]);
 
   const predefinedSuggestions = [
     "What are today's active events?",
     "Show me issues in Kochi North.",
     "Where can I redeem points?",
-    "How do I report a pothole?"
+    "How do I report a pothole?",
+    "What are the most severe issues in my area?",
+    "Tell me about recent civic reports"
   ];
 
   const handleSendMessage = async () => {
@@ -45,20 +108,52 @@ const ChatBot = () => {
     setInputValue("");
     setIsTyping(true);
 
-    // Simulate bot response
-    setTimeout(() => {
+    try {
+      // Call backend API with Gemini AI
+      const response = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/chatbot/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: inputValue,
+          userId: user?.id || null
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to get AI response');
+      }
+
+      const data = await response.json();
+      
       const botResponse = {
         id: messages.length + 2,
         type: "bot",
-        content: getBotResponse(inputValue),
+        content: data.response,
         timestamp: new Date()
       };
+      
       setMessages(prev => [...prev, botResponse]);
+    } catch (error) {
+      console.error('Error calling chatbot API:', error);
+      
+      // Use fallback response when backend is not available
+      const fallbackResponse = {
+        id: messages.length + 2,
+        type: "bot",
+        content: getFallbackResponse(inputValue),
+        timestamp: new Date()
+      };
+      
+      setMessages(prev => [...prev, fallbackResponse]);
+    } finally {
       setIsTyping(false);
-    }, 1500);
+    }
   };
 
-  const getBotResponse = (userInput: string) => {
+  // Fallback response function (kept for reference)
+  const getFallbackResponse = (userInput: string) => {
     const input = userInput.toLowerCase();
     
     if (input.includes("event") || input.includes("activity")) {
@@ -102,7 +197,10 @@ const ChatBot = () => {
 
       {/* Chat Window */}
       {isOpen && (
-        <Card className="fixed bottom-6 right-6 w-80 h-96 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-2xl z-50 flex flex-col animate-in slide-in-from-bottom-4 duration-300">
+        <Card
+          className="fixed bottom-6 right-6 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-2xl z-50 flex flex-col animate-in slide-in-from-bottom-4 duration-300"
+          style={{ width: chatWidth, height: chatHeight, minWidth: 280, minHeight: 320 }}
+        >
           {/* Chat Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-t-lg">
             <div className="flex items-center space-x-2">
@@ -141,7 +239,7 @@ const ChatBot = () => {
                       <Bot className="h-4 w-4 mt-0.5 text-slate-600 dark:text-slate-400" />
                     )}
                     <div className="flex-1">
-                      <div className="text-sm">{message.content}</div>
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
                       <div className={`text-xs mt-1 ${
                         message.type === 'user' 
                           ? 'text-teal-100' 
@@ -171,23 +269,7 @@ const ChatBot = () => {
             )}
           </div>
 
-          {/* Suggestions */}
-          {messages.length === 1 && (
-            <div className="px-4 pb-2">
-              <div className="text-xs text-slate-500 dark:text-slate-400 mb-2">Try asking:</div>
-              <div className="flex flex-wrap gap-1">
-                {predefinedSuggestions.slice(0, 2).map((suggestion, index) => (
-                  <button
-                    key={index}
-                    onClick={() => handleSuggestionClick(suggestion)}
-                    className="text-xs bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-1 rounded hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
-                  >
-                    {suggestion}
-                  </button>
-                ))}
-              </div>
-            </div>
-          )}
+          
 
           {/* Chat Input */}
           <div className="border-t border-slate-200 dark:border-slate-700 p-4">
@@ -209,6 +291,17 @@ const ChatBot = () => {
               </Button>
             </div>
           </div>
+          {/* Resize handles for all edges and corners */}
+          {/* Corners */}
+          <div onMouseDown={e => startResize(e, 'top-left')} style={{position:'absolute',top:0,left:0,width:16,height:16,cursor:'nwse-resize',zIndex:10}} />
+          <div onMouseDown={e => startResize(e, 'top-right')} style={{position:'absolute',top:0,right:0,width:16,height:16,cursor:'nesw-resize',zIndex:10}} />
+          <div onMouseDown={e => startResize(e, 'bottom-left')} style={{position:'absolute',bottom:0,left:0,width:16,height:16,cursor:'nesw-resize',zIndex:10}} />
+          <div onMouseDown={e => startResize(e, 'bottom-right')} style={{position:'absolute',bottom:0,right:0,width:16,height:16,cursor:'nwse-resize',zIndex:10}} />
+          {/* Edges */}
+          <div onMouseDown={e => startResize(e, 'top')} style={{position:'absolute',top:0,left:16,right:16,height:8,cursor:'ns-resize',zIndex:10}} />
+          <div onMouseDown={e => startResize(e, 'bottom')} style={{position:'absolute',bottom:0,left:16,right:16,height:8,cursor:'ns-resize',zIndex:10}} />
+          <div onMouseDown={e => startResize(e, 'left')} style={{position:'absolute',top:16,bottom:16,left:0,width:8,cursor:'ew-resize',zIndex:10}} />
+          <div onMouseDown={e => startResize(e, 'right')} style={{position:'absolute',top:16,bottom:16,right:0,width:8,cursor:'ew-resize',zIndex:10}} />
         </Card>
       )}
     </>

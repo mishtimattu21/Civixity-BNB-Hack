@@ -15,9 +15,10 @@ import { useNavigate } from "react-router-dom";
 interface NavbarProps {
   sidebarCollapsed: boolean;
   setSidebarCollapsed: (collapsed: boolean) => void;
+  user: any;
 }
 
-const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }: NavbarProps) => {
+const Navbar = ({ sidebarCollapsed, setSidebarCollapsed, user }: NavbarProps) => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -72,10 +73,19 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed }: NavbarProps) => {
           {/* User Menu */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" size="icon" className="relative">
-                <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <User className="h-4 w-4 text-white" />
-                </div>
+              <Button variant="ghost" size="icon" className="p-0 rounded-full">
+                {user && user.user_metadata?.avatar_url ? (
+                  <img
+                    src={user.user_metadata.avatar_url}
+                    alt="avatar"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  // fallback: initials or icon
+                  <span className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-r from-blue-500 to-purple-500 text-white font-bold text-lg">
+                    {user && user.email ? user.email[0].toUpperCase() : <User className="h-4 w-4 text-white" />}
+                  </span>
+                )}
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48 bg-white dark:bg-slate-800">
