@@ -1,24 +1,21 @@
-from transformers import AutoImageProcessor, AutoModelForImageClassification
+import keras_cv
+import tensorflow as tf
+import numpy as np
 from PIL import Image
-import torch
+import matplotlib.pyplot as plt
 
-# Load model and processor
-model = AutoModelForImageClassification.from_pretrained("orion/fake-image-detector")
-processor = AutoImageProcessor.from_pretrained("orion/fake-image-detector")
+# Load the pretrained model
+model = keras_cv.models.DeepFakeDetector()
 
 # Load image
-image = Image.open("normal.jpg")
+image = Image.open("normal.jpg").resize((256, 256))
+image = np.array(image) / 255.0  # Normalize
+image = tf.expand_dims(image, 0)  # Add batch dimension
 
-# Prepare and predict
-inputs = processor(images=image, return_tensors="pt")
-outputs = model(**inputs)
+# Predict
+score = model(image).numpy()[0][0]  # Confidence score (0: Real, 1: Fake)
 
-# Get result
-logits = outputs.logits
-predicted_class = torch.argmax(logits, dim=1).item()
-
-# Interpret result
-if predicted_class == 1:
-    print("Fake / AI-generated image")
+if score > 0.5:
+    print(f"Fake/AI-generated image detected (Confidence: {score:.2f})")
 else:
-    print("Real image")
+    print(f"Real image detected (Confidence: {score:.2f})")

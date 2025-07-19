@@ -14,7 +14,8 @@ import {
   ChevronLeft,
   ChevronRight,
   Plus,
-  Camera
+  Camera,
+  Trash
 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -219,7 +220,7 @@ const HomePage = () => {
         title: newPost.title,
         description: newPost.description,
         author: postUsername,
-        user_id: postAnonymous ? null : user?.id,
+        user_id: user?.id,
         timestamp: new Date().toISOString(),
         location: newPost.location,
         category: finalCategory,
@@ -286,6 +287,23 @@ const HomePage = () => {
     localStorage.setItem('userVotes', JSON.stringify(newVotes));
   };
 
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [postToDelete, setPostToDelete] = useState(null);
+
+  // Handle deleting a post
+  const handleDeletePost = async () => {
+    if (!postToDelete) return;
+    const { error } = await supabase.from('posts').delete().eq('id', postToDelete);
+    if (!error) {
+      setPosts(posts.filter(p => p.id !== postToDelete));
+      toast({ title: "Deleted", description: "Your post has been deleted." });
+    } else {
+      toast({ title: "Error", description: "Failed to delete post." });
+    }
+    setDeleteDialogOpen(false);
+    setPostToDelete(null);
+  };
+
   const getSeverityColor = (severity: number) => {
     if (severity >= 8) return "bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300";
     if (severity >= 6) return "bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300";
@@ -327,6 +345,46 @@ const HomePage = () => {
   }, [posts]);
 
   const [selectedStory, setSelectedStory] = useState<any | null>(null);
+  const [comments, setComments] = useState<{ [postId: string]: any[] }>({});
+  const [newComment, setNewComment] = useState<{ [postId: string]: string }>({});
+  const [expandedComments, setExpandedComments] = useState<{ [postId: string]: boolean }>({});
+  const [commentCounts, setCommentCounts] = useState<{ [postId: string]: number }>({});
+
+  // Fetch comments for a post
+  const fetchComments = async (postId: string) => {
+    const { data, error } = await supabase
+      .from('comments')
+      .select('*')
+      .eq('post_id', postId)
+      .order('created_at', { ascending: true });
+    if (!error) {
+      setComments(prev => ({ ...prev, [postId]: data }));
+      setCommentCounts(prev => ({ ...prev, [postId]: data.length }));
+    }
+  };
+
+  // Fetch comments when posts are loaded
+  useEffect(() => {
+    posts.forEach(post => {
+      fetchComments(post.id);
+    });
+  }, [posts]);
+
+  // Add a comment
+  const handleAddComment = async (postId: string) => {
+    if (!newComment[postId]?.trim()) return;
+    const { error } = await supabase.from('comments').insert([{
+      post_id: postId,
+      user_id: user?.id,
+      author: username || user?.email || 'Anonymous',
+      content: newComment[postId],
+    }]);
+    if (!error) {
+      setNewComment(prev => ({ ...prev, [postId]: '' }));
+      fetchComments(postId);
+      setCommentCounts(prev => ({ ...prev, [postId]: (prev[postId] || 0) + 1 }));
+    }
+  };
 
   return (
     <div className="max-w-4xl mx-auto space-y-6">
@@ -560,7 +618,7 @@ const HomePage = () => {
             <Card key={post.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
               <CardContent className="p-6">
                 {/* Post Header */}
-                <div className="flex items-start justify-between mb-4">
+                <div className="flex items-start justify-between mb-4 relative">
                   <div className="flex items-center space-x-3">
                     <Avatar>
                       <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
@@ -581,6 +639,15 @@ const HomePage = () => {
                     <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                       AI Detected
                     </Badge>
+                  )}
+                 {post.user_id && user?.id && post.user_id === user.id && (
+                    <button
+                      onClick={() => { setDeleteDialogOpen(true); setPostToDelete(post.id); }}
+                      className="absolute -top-3 right-2 p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors"
+                      title="Delete post"
+                    >
+                      <Trash className="h-5 w-5" />
+                    </button>
                   )}
                 </div>
 
@@ -673,17 +740,57 @@ const HomePage = () => {
                       variant="ghost" 
                       size="sm"
                       className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                      onClick={() => setExpandedComments(prev => ({ ...prev, [post.id]: !prev[post.id] }))}
                     >
                       <MessageCircle className="h-4 w-4 mr-1" />
-                      {post.comments}
+                      {commentCounts[post.id] || 0}
                     </Button>
                   </div>
                 </div>
+
+                {/* Comments Section */}
+                {expandedComments[post.id] && (
+                  <div className="mt-4">
+                    <div className="font-semibold mb-2 text-slate-700 dark:text-slate-200">Comments</div>
+                    <div className="space-y-2 mb-2">
+                      {(comments[post.id] || []).map(comment => (
+                        <div key={comment.id} className="bg-slate-100 dark:bg-slate-700 rounded p-2">
+                          <div className="text-xs text-slate-500 dark:text-slate-400 mb-1">{comment.author} • {new Date(comment.created_at).toLocaleString()}</div>
+                          <div className="text-slate-900 dark:text-white">{comment.content}</div>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="flex gap-2">
+                      <Input
+                        value={newComment[post.id] || ''}
+                        onChange={e => setNewComment(prev => ({ ...prev, [post.id]: e.target.value }))}
+                        placeholder="Add a comment..."
+                        className="flex-1"
+                      />
+                      <Button onClick={() => handleAddComment(post.id)} disabled={!newComment[post.id]?.trim()}>Post</Button>
+                    </div>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))
         )}
       </div>
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={open => { setDeleteDialogOpen(open); if (!open) setPostToDelete(null); }}>
+        <DialogContent className="max-w-sm bg-white dark:bg-slate-800">
+          <DialogHeader>
+            <DialogTitle className="text-slate-900 dark:text-white">Delete Post</DialogTitle>
+          </DialogHeader>
+          <div className="mb-4 text-slate-700 dark:text-slate-300">
+            Are you sure you want to delete this post? This action cannot be undone.
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={() => { setDeleteDialogOpen(false); setPostToDelete(null); }}>Cancel</Button>
+            <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={handleDeletePost}>Delete</Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
