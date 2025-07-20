@@ -460,33 +460,46 @@ const HomePage = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6">
+    <div className="max-w-4xl mx-auto space-y-8 p-4">
+      {/* Hero Section with Gradient Background */}
+      {/* <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-8 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10">
+          <h1 className="text-3xl font-bold mb-2">Civic Engagement Hub</h1>
+          <p className="text-blue-100 text-lg">Connect with your community and make a difference</p>
+        </div>
+        <div className="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -translate-y-16 translate-x-16"></div>
+        <div className="absolute bottom-0 left-0 w-24 h-24 bg-white/5 rounded-full translate-y-12 -translate-x-12"></div>
+      </div> */}
+
       {/* Stories Section */}
-      <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-        <CardHeader>
-          <CardTitle className="text-lg font-semibold text-slate-900 dark:text-white">
+      <Card className="bg-white/80 dark:bg-slate-800/80 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+        <CardHeader className="pb-4">
+          <CardTitle className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+            <div className="w-2 h-2 bg-gradient-to-r from-green-400 to-blue-500 rounded-full animate-pulse"></div>
             Recent Updates (Last 24 Hours)
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="flex space-x-4 overflow-x-auto pb-2">
-            {topSeverePosts.map((post) => (
+          <div className="flex space-x-6 overflow-x-auto pb-4 scrollbar-hide">
+            {topSeverePosts.map((post, index) => (
               <div
                 key={post.id}
-                className="flex-shrink-0 w-32 cursor-pointer group"
+                className="flex-shrink-0 w-36 cursor-pointer group transform hover:scale-105 transition-all duration-300"
                 onClick={() => setSelectedStory(post)}
+                style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="w-20 h-20 bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-full flex items-center justify-center mb-2 mx-auto group-hover:scale-105 transition-transform">
-                  <MapPin className="h-8 w-8 text-teal-600 dark:text-teal-400" />
+                <div className="w-24 h-24 bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-2xl flex items-center justify-center mb-3 mx-auto group-hover:shadow-lg transition-all duration-300 group-hover:rotate-3">
+                  <MapPin className="h-10 w-10 text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform" />
                 </div>
                 <div className="text-center">
-                  <div className="text-xs font-medium text-slate-900 dark:text-white truncate">
+                  <div className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {post.title}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 truncate">
+                  <div className="text-xs text-slate-500 dark:text-slate-400 truncate mt-1">
                     {post.location}
                   </div>
-                  <div className="text-xs text-slate-400 dark:text-slate-500">
+                  <div className="text-xs text-slate-400 dark:text-slate-500 mt-1">
                     {post.timestamp ? formatDistanceToNow(parseISO(post.timestamp), { addSuffix: true }) : ''}
                   </div>
                 </div>
@@ -551,44 +564,54 @@ const HomePage = () => {
       {/* Create New Post */}
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogTrigger asChild>
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 cursor-pointer hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                  <Plus className="h-5 w-5 text-white" />
+          <Card className="bg-gradient-to-r from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 border-purple-200 dark:border-purple-700 cursor-pointer hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group">
+            <CardContent className="p-6">
+              <div className="flex items-center space-x-4">
+                <div className="w-12 h-12 bg-gradient-to-r from-purple-500 to-pink-500 rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                  <Plus className="h-6 w-6 text-white" />
                 </div>
-                <div className="flex-1 text-slate-500 dark:text-slate-400">
-                  Report a new civic issue in your area...
+                <div className="flex-1">
+                  <div className="text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                    Report a New Issue
+                  </div>
+                  <div className="text-slate-600 dark:text-slate-400">
+                    Help improve your community by reporting civic issues
+                  </div>
                 </div>
-                <Camera className="h-5 w-5 text-slate-400" />
+                <Camera className="h-6 w-6 text-purple-500 dark:text-purple-400 group-hover:scale-110 transition-transform" />
               </div>
             </CardContent>
           </Card>
         </DialogTrigger>
-        <DialogContent className="bg-white dark:bg-slate-800 max-w-md">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-white">Report New Issue</DialogTitle>
+        <DialogContent className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm max-w-lg border-0 shadow-2xl">
+          <DialogHeader className="pb-6">
+            <DialogTitle className="text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-pink-500 rounded-lg flex items-center justify-center">
+                <Plus className="h-4 w-4 text-white" />
+              </div>
+              Report New Issue
+            </DialogTitle>
           </DialogHeader>
           <form className="space-y-4" onSubmit={handleSubmit}>
-            <div>
-              <Label htmlFor="title">Issue Title</Label>
+            <div className="space-y-2">
+              <Label htmlFor="title" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Issue Title</Label>
               <Input 
                 id="title"
                 placeholder="Brief description of the issue"
                 value={newPost.title}
                 onChange={(e) => setNewPost({...newPost, title: e.target.value})}
-                className="bg-white dark:bg-slate-700"
+                className="bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm border-slate-300 dark:border-slate-600 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500/20 transition-all duration-200"
                 required
               />
             </div>
-            <div>
-              <Label htmlFor="description">Description</Label>
+            <div className="space-y-2">
+              <Label htmlFor="description" className="text-sm font-semibold text-slate-700 dark:text-slate-300">Description</Label>
               <Textarea 
                 id="description"
                 placeholder="Provide more details about the issue"
                 value={newPost.description}
                 onChange={(e) => setNewPost({...newPost, description: e.target.value})}
-                className="bg-white dark:bg-slate-700"
+                className="bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm border-slate-300 dark:border-slate-600 focus:border-purple-500 dark:focus:border-purple-400 focus:ring-purple-500/20 transition-all duration-200"
                 rows={3}
                 required
               />
@@ -662,8 +685,19 @@ const HomePage = () => {
               />
               <Label htmlFor="postAnonymous">Post as anonymous</Label>
             </div>
-            <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600" type="submit" disabled={uploading || aiDetected}>
-              {uploading ? 'Submitting...' : 'Submit Report'}
+            <Button 
+              className="w-full bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-semibold py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02]" 
+              type="submit" 
+              disabled={uploading || aiDetected}
+            >
+              {uploading ? (
+                <div className="flex items-center gap-2">
+                  <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                  Submitting...
+                </div>
+              ) : (
+                'Submit Report'
+              )}
             </Button>
           </form>
         </DialogContent>
@@ -703,31 +737,44 @@ const HomePage = () => {
       </Dialog>
 
       {/* Civic Posts Feed */}
-      <div className="space-y-4">
+      <div className="space-y-6">
         {loading ? (
-          <div className="text-center text-slate-500 dark:text-slate-400 py-8">Loading posts...</div>
+          <div className="text-center py-12">
+            <div className="inline-flex items-center gap-2 text-slate-500 dark:text-slate-400">
+              <div className="w-6 h-6 border-2 border-slate-300 dark:border-slate-600 border-t-blue-500 rounded-full animate-spin"></div>
+              Loading posts...
+            </div>
+          </div>
         ) : (
-          posts.map((post) => (
-            <Card key={post.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
-              <CardContent className="p-6">
-                {/* Post Header */}
-                <div className="flex items-start justify-between mb-4 relative">
-                  <div className="flex items-center space-x-3">
-                    <Avatar>
-                      <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-                        {post.author.split(' ').map(n => n[0]).join('')}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div>
-                      <div className="font-medium text-slate-900 dark:text-white">{post.author}</div>
-                      <div className="flex items-center space-x-2 text-sm text-slate-500 dark:text-slate-400">
-                        <Clock className="h-3 w-3" />
-                        <span>{post.timestamp ? formatDistanceToNow(parseISO(post.timestamp), { addSuffix: true }) : ''}</span>
-                        <MapPin className="h-3 w-3 ml-2" />
-                        <span>{post.location}</span>
+          posts.map((post, index) => (
+            <Card 
+              key={post.id} 
+              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
+              style={{ animationDelay: `${index * 50}ms` }}
+            >
+                              <CardContent className="p-6">
+                  {/* Post Header */}
+                  <div className="flex items-start justify-between mb-6 relative">
+                    <div className="flex items-center space-x-4">
+                      <Avatar className="w-12 h-12 ring-2 ring-purple-100 dark:ring-purple-900/30 group-hover:ring-purple-200 dark:group-hover:ring-purple-800/50 transition-all duration-300">
+                        <AvatarFallback className="bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold text-lg">
+                          {post.author.split(' ').map(n => n[0]).join('')}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div>
+                        <div className="font-semibold text-slate-900 dark:text-white text-lg">{post.author}</div>
+                        <div className="flex items-center space-x-3 text-sm text-slate-500 dark:text-slate-400 mt-1">
+                          <div className="flex items-center gap-1">
+                            <Clock className="h-4 w-4" />
+                            <span>{post.timestamp ? formatDistanceToNow(parseISO(post.timestamp), { addSuffix: true }) : ''}</span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <MapPin className="h-4 w-4" />
+                            <span>{post.location}</span>
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
                   {post.ai_detected && (
                     <Badge variant="secondary" className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                       AI Detected
@@ -736,41 +783,42 @@ const HomePage = () => {
                  {post.user_id && user?.id && post.user_id === user.id && (
                     <button
                       onClick={() => { setDeleteDialogOpen(true); setPostToDelete(post.id); }}
-                      className="absolute -top-3 right-2 p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors"
+                      className="absolute -top-2 right-2 p-3 rounded-full bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 group/delete"
                       title="Delete post"
                     >
-                      <Trash className="h-5 w-5" />
+                      <Trash className="h-4 w-4 group-hover/delete:rotate-12 transition-transform" />
                     </button>
                   )}
                 </div>
 
-                {/* Post Content */}
-                <div className="mb-4">
-                  <h3 className="text-lg font-semibold text-slate-900 dark:text-white mb-2">
-                    {post.title}
-                  </h3>
-                  <p className="text-slate-600 dark:text-slate-300 mb-3">
-                    {post.description}
-                  </p>
-                  {post.image_url && post.image_url !== 'null' && post.image_url !== '' ? (
-                    <img
-                      src={post.image_url}
-                      alt="Post"
-                      className="mb-3 rounded-lg"
-                      style={{ maxWidth: '100%', maxHeight: 350, width: 'auto', height: 'auto', objectFit: 'contain', display: 'block', marginLeft: 'auto', marginRight: 'auto' }}
-                    />
-                  ) : null}
-                  
-                  {/* Tags and Severity */}
-                  <div className="flex items-center space-x-2 mb-3">
-                    <Badge variant="outline" className={getCategoryColor(post.category)}>
-                      {post.category}
-                    </Badge>
-                    <Badge className={getSeverityColor(post.severity)}>
-                      <AlertTriangle className="h-3 w-3 mr-1" />
-                      {getSeverityLabel(post.severity)} ({post.severity}/10)
-                    </Badge>
-                  </div>
+                                  {/* Post Content */}
+                  <div className="mb-6">
+                    <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3 group-hover:text-purple-600 dark:group-hover:text-purple-400 transition-colors">
+                      {post.title}
+                    </h3>
+                    <p className="text-slate-600 dark:text-slate-300 mb-4 text-base leading-relaxed">
+                      {post.description}
+                    </p>
+                    {post.image_url && post.image_url !== 'null' && post.image_url !== '' ? (
+                      <div className="mb-4 overflow-hidden rounded-xl">
+                        <img
+                          src={post.image_url}
+                          alt="Post"
+                          className="w-full h-auto max-h-96 object-cover group-hover:scale-105 transition-transform duration-500"
+                        />
+                      </div>
+                    ) : null}
+                    
+                    {/* Tags and Severity */}
+                    <div className="flex items-center space-x-3 mb-4">
+                      <Badge variant="outline" className={`${getCategoryColor(post.category)} px-3 py-1 text-sm font-medium border-2`}>
+                        {post.category}
+                      </Badge>
+                      <Badge className={`${getSeverityColor(post.severity)} px-3 py-1 text-sm font-medium`}>
+                        <AlertTriangle className="h-4 w-4 mr-1" />
+                        {getSeverityLabel(post.severity)} ({post.severity}/10)
+                      </Badge>
+                    </div>
 
                   {/* Similar Posts */}
                   {post.similar_posts > 0 && (
@@ -788,24 +836,24 @@ const HomePage = () => {
                 </div>
 
                 {/* Post Actions */}
-                <div className="flex items-center justify-between pt-3 border-t border-slate-200 dark:border-slate-700">
-                  <div className="flex items-center space-x-4">
+                <div className="flex items-center justify-between pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
+                  <div className="flex items-center space-x-2">
                     <Button 
                       variant="ghost" 
                       size="sm"
                       onClick={() => handleVote(post.id, 'up')}
                       className={
                         (userVotes[post.id] === 'up'
-                          ? 'bg-green-100 border border-green-300 dark:bg-green-900/40'
-                          : 'hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/30 dark:hover:text-green-400') +
-                        ' flex items-center'
+                          ? 'bg-green-100 border-2 border-green-300 dark:bg-green-900/40 dark:border-green-600 shadow-lg'
+                          : 'hover:bg-green-50 hover:text-green-600 dark:hover:bg-green-900/30 dark:hover:text-green-400 hover:shadow-md') +
+                        ' flex items-center px-4 py-2 rounded-xl transition-all duration-200 transform hover:scale-105'
                       }
                       disabled={userVotes[post.id] === 'up'}
                     >
                       <ThumbsUp className={
-                        `h-4 w-4 mr-1 ${userVotes[post.id] === 'up' ? 'text-black dark:text-white' : 'text-green-600 dark:text-green-400'}`
+                        `h-5 w-5 mr-2 ${userVotes[post.id] === 'up' ? 'text-green-700 dark:text-green-300' : 'text-green-600 dark:text-green-400'}`
                       } />
-                      <span className={userVotes[post.id] === 'up' ? 'text-black dark:text-white font-bold' : 'text-green-600 dark:text-green-400'}>
+                      <span className={`font-semibold ${userVotes[post.id] === 'up' ? 'text-green-700 dark:text-green-300' : 'text-green-600 dark:text-green-400'}`}>
                         {post.upvotes}
                       </span>
                     </Button>
@@ -815,65 +863,73 @@ const HomePage = () => {
                       onClick={() => handleVote(post.id, 'down')}
                       className={
                         (userVotes[post.id] === 'down'
-                          ? 'bg-red-100 border border-red-300 dark:bg-red-900/40'
-                          : 'hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400') +
-                        ' flex items-center'
+                          ? 'bg-red-100 border-2 border-red-300 dark:bg-red-900/40 dark:border-red-600 shadow-lg'
+                          : 'hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/30 dark:hover:text-red-400 hover:shadow-md') +
+                        ' flex items-center px-4 py-2 rounded-xl transition-all duration-200 transform hover:scale-105'
                       }
                       disabled={userVotes[post.id] === 'down'}
                     >
                       <ThumbsDown className={
-                        "h-4 w-4 mr-1 " +
-                        (userVotes[post.id] === 'down' ? 'text-black dark:text-white' : 'text-red-600 dark:text-red-400')
+                        `h-5 w-5 mr-2 ${userVotes[post.id] === 'down' ? 'text-red-700 dark:text-red-300' : 'text-red-600 dark:text-red-400'}`
                       } />
-                      <span className={userVotes[post.id] === 'down' ? 'text-black dark:text-white font-bold' : 'text-red-600 dark:text-red-400'}>
+                      <span className={`font-semibold ${userVotes[post.id] === 'down' ? 'text-red-700 dark:text-red-300' : 'text-red-600 dark:text-red-400'}`}>
                         {post.downvotes}
                       </span>
                     </Button>
                     <Button 
                       variant="ghost" 
                       size="sm"
-                      className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400"
+                      className="hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 flex items-center px-4 py-2 rounded-xl transition-all duration-200 transform hover:scale-105 hover:shadow-md"
                       onClick={() => setExpandedComments(prev => ({ ...prev, [String(post.id)]: !prev[String(post.id)] }))}
                     >
-                      <MessageCircle className="h-4 w-4 mr-1" />
-                      {commentCounts[String(post.id)] || 0}
+                      <MessageCircle className="h-5 w-5 mr-2" />
+                      <span className="font-semibold">{commentCounts[String(post.id)] || 0}</span>
                     </Button>
                   </div>
                 </div>
 
                 {/* Comments Section */}
                 {expandedComments[String(post.id)] && (
-                  <div className="mt-4">
-                    <div className="font-semibold mb-2 text-slate-700 dark:text-slate-200">Comments</div>
-                    <div className="space-y-2 mb-2">
+                  <div className="mt-6 animate-fade-in-up">
+                    <div className="font-bold text-lg mb-4 text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                      <MessageCircle className="h-5 w-5 text-blue-500" />
+                      Comments ({commentCounts[String(post.id)] || 0})
+                    </div>
+                    <div className="space-y-3 mb-4">
                       {(comments[String(post.id)] || []).map(comment => (
-                        <div key={comment.id} className="bg-slate-100 dark:bg-slate-700 rounded p-2 relative">
-                          <div className="flex items-center justify-between mb-1">
-                            <div className="text-xs text-slate-500 dark:text-slate-400">
+                        <div key={comment.id} className="bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700 dark:to-slate-800 rounded-xl p-4 relative hover-lift border border-slate-200/50 dark:border-slate-600/50">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-sm font-medium text-slate-600 dark:text-slate-300">
                               {comment.author} • {comment.created_at ? formatDistanceToNow(new Date(comment.created_at), { addSuffix: true }) : ''}
                             </div>
                             {comment.user_id === user?.id && (
                               <button
                                 onClick={() => handleDeleteComment(comment.id, String(post.id))}
-                                className="p-1 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-colors absolute top-1 right-1"
+                                className="p-2 rounded-full hover:bg-red-100 dark:hover:bg-red-900/30 text-red-600 dark:text-red-400 transition-all duration-200 hover:scale-110"
                                 title="Delete comment"
                               >
                                 <Trash className="h-4 w-4" />
                               </button>
                             )}
                           </div>
-                          <div className="text-slate-900 dark:text-white">{comment.content}</div>
+                          <div className="text-slate-900 dark:text-white text-base leading-relaxed">{comment.content}</div>
                         </div>
                       ))}
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-3">
                       <Input
                         value={newComment[String(post.id)] || ''}
                         onChange={e => setNewComment(prev => ({ ...prev, [String(post.id)]: e.target.value }))}
-                        placeholder="Add a comment..."
-                        className="flex-1"
+                        placeholder="Share your thoughts..."
+                        className="flex-1 bg-white/80 dark:bg-slate-700/80 backdrop-blur-sm border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 transition-all duration-200 rounded-xl"
                       />
-                      <Button onClick={() => handleAddComment(String(post.id))} disabled={!newComment[String(post.id)]?.trim()}>Post</Button>
+                      <Button 
+                        onClick={() => handleAddComment(String(post.id))} 
+                        disabled={!newComment[String(post.id)]?.trim()}
+                        className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+                      >
+                        Post
+                      </Button>
                     </div>
                   </div>
                 )}
@@ -884,16 +940,32 @@ const HomePage = () => {
       </div>
       {/* Delete Confirmation Dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={open => { setDeleteDialogOpen(open); if (!open) setPostToDelete(null); }}>
-        <DialogContent className="max-w-sm bg-white dark:bg-slate-800">
-          <DialogHeader>
-            <DialogTitle className="text-slate-900 dark:text-white">Delete Post</DialogTitle>
+        <DialogContent className="max-w-md bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-0 shadow-2xl">
+          <DialogHeader className="pb-6">
+            <DialogTitle className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+              <div className="w-8 h-8 bg-red-500 rounded-lg flex items-center justify-center">
+                <Trash className="h-4 w-4 text-white" />
+              </div>
+              Delete Post
+            </DialogTitle>
           </DialogHeader>
-          <div className="mb-4 text-slate-700 dark:text-slate-300">
-            Are you sure you want to delete this post? This action cannot be undone.
+          <div className="mb-6 text-slate-700 dark:text-slate-300 text-base leading-relaxed">
+            Are you sure you want to delete this post? This action cannot be undone and you will lose 30 points.
           </div>
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={() => { setDeleteDialogOpen(false); setPostToDelete(null); }}>Cancel</Button>
-            <Button className="bg-red-600 hover:bg-red-700 text-white" onClick={handleDeletePost}>Delete</Button>
+          <div className="flex justify-end gap-3">
+            <Button 
+              variant="outline" 
+              onClick={() => { setDeleteDialogOpen(false); setPostToDelete(null); }}
+              className="px-6 py-2 rounded-xl border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700 transition-all duration-200"
+            >
+              Cancel
+            </Button>
+            <Button 
+              className="bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 text-white font-semibold px-6 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105" 
+              onClick={handleDeletePost}
+            >
+              Delete Post
+            </Button>
           </div>
         </DialogContent>
       </Dialog>

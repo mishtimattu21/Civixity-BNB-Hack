@@ -34,7 +34,7 @@ export const BackgroundProvider: React.FC<BackgroundProviderProps> = ({ children
         className={`absolute inset-0 ${
           theme === 'dark' 
             ? 'bg-black/20' 
-            : 'bg-white/30'
+            : 'bg-custom-beige/30'
         }`}
       />
       

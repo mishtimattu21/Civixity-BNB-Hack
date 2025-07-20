@@ -234,12 +234,18 @@ const VolunteerActivities = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col lg:flex-row gap-6">
+    <div className="max-w-6xl mx-auto space-y-8 p-4">
+
+      <div className="flex flex-col lg:flex-row gap-8">
         {/* Calendar Section */}
-        <Card className="lg:w-1/3 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-          <CardHeader>
-            <CardTitle className="text-slate-900 dark:text-white">Activity Calendar</CardTitle>
+        <Card className="lg:w-1/3 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <CardHeader className="pb-4">
+            <CardTitle className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-3">
+              <div className="w-8 h-8 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-lg flex items-center justify-center">
+                <CalendarIcon className="h-4 w-4 text-white" />
+              </div>
+              Activity Calendar
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <Calendar
@@ -248,7 +254,7 @@ const VolunteerActivities = () => {
               onSelect={setSelectedDate}
               month={currentMonth}
               onMonthChange={setCurrentMonth}
-              className="rounded-md border border-slate-200 dark:border-slate-700"
+              className="rounded-xl border border-slate-200/50 dark:border-slate-700/50 shadow-sm"
               modifiers={{
                 hasEvent: (date) => getEventsForDate(date).length > 0
               }}
@@ -256,16 +262,17 @@ const VolunteerActivities = () => {
                 hasEvent: { 
                   backgroundColor: 'rgb(20 184 166)', 
                   color: 'white',
-                  fontWeight: 'bold'
+                  fontWeight: 'bold',
+                  borderRadius: '8px'
                 }
               }}
             />
-            <div className="mt-4 text-sm text-slate-600 dark:text-slate-400">
-              <div className="flex items-center space-x-2 mb-2">
-                <div className="w-3 h-3 bg-teal-500 rounded-full"></div>
-                <span>Days with events</span>
+            <div className="mt-6 space-y-3">
+              <div className="flex items-center space-x-3 text-sm text-slate-600 dark:text-slate-400">
+                <div className="w-4 h-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-sm"></div>
+                <span className="font-medium">Days with events</span>
               </div>
-              <div className="text-xs">
+              <div className="text-xs text-slate-500 dark:text-slate-500 bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
                 Click on highlighted dates to view events
               </div>
             </div>
@@ -273,52 +280,58 @@ const VolunteerActivities = () => {
         </Card>
 
         {/* Events List */}
-        <div className="lg:w-2/3 space-y-4">
+        <div className="lg:w-2/3 space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-slate-900 dark:text-white">
-              {showAllEvents ? (
-                'All Upcoming Events'
-              ) : selectedDate ? (
-                `Events for ${selectedDate.toLocaleDateString('en-US', { 
-                  weekday: 'long', 
-                  year: 'numeric', 
-                  month: 'long', 
-                  day: 'numeric' 
-                })}`
-              ) : (
-                'All Events'
-              )}
-            </h2>
-            <div className="flex space-x-2">
-              <Button
-                variant={showAllEvents ? "default" : "outline"}
-                size="sm"
-                onClick={() => {
-                  setShowAllEvents(!showAllEvents);
-                  if (showAllEvents) {
-                    setSelectedDate(new Date('2024-07-20'));
-                  } else {
-                    setSelectedDate(undefined);
-                  }
-                }}
-              >
-                {showAllEvents ? 'View by Date' : 'View All Events'}
-              </Button>
+            <div>
+              <h2 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">
+                {showAllEvents ? (
+                  'All Upcoming Events'
+                ) : selectedDate ? (
+                  `Events for ${selectedDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}`
+                ) : (
+                  'All Events'
+                )}
+              </h2>
+              <p className="text-slate-600 dark:text-slate-400">
+                {showAllEvents ? 'Browse all available volunteer opportunities' : 'Events scheduled for the selected date'}
+              </p>
             </div>
+            <Button
+              variant={showAllEvents ? "default" : "outline"}
+              size="sm"
+              onClick={() => {
+                setShowAllEvents(!showAllEvents);
+                if (showAllEvents) {
+                  setSelectedDate(new Date('2024-07-20'));
+                } else {
+                  setSelectedDate(undefined);
+                }
+              }}
+              className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold px-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              {showAllEvents ? 'View by Date' : 'View All Events'}
+            </Button>
           </div>
 
           {!showAllEvents && selectedDate && getEventsForDate(selectedDate).length === 0 ? (
-            <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-              <CardContent className="p-8 text-center">
-                <CalendarIcon className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-                <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+              <CardContent className="p-12 text-center">
+                <div className="w-20 h-20 bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <CalendarIcon className="h-10 w-10 text-emerald-600 dark:text-emerald-400" />
+                </div>
+                <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
                   No events scheduled
                 </h3>
-                <p className="text-slate-600 dark:text-slate-400">
-                  There are no volunteer activities scheduled for this date.
+                <p className="text-slate-600 dark:text-slate-400 mb-6 max-w-md mx-auto">
+                  There are no volunteer activities scheduled for this date. Check other dates or browse all available opportunities.
                 </p>
                 <Button 
-                  className="mt-4 bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
+                  className="bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   onClick={() => setShowAllEvents(true)}
                 >
                   View All Events
@@ -326,77 +339,125 @@ const VolunteerActivities = () => {
               </CardContent>
             </Card>
           ) : (
-            <div className="space-y-4">
-              {(showAllEvents ? events : (selectedDate ? getEventsForDate(selectedDate) : events)).map((event) => (
-                <Card key={event.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+            <div className="space-y-6">
+              {(showAllEvents ? events : (selectedDate ? getEventsForDate(selectedDate) : events)).map((event, index) => (
+                <Card 
+                  key={event.id} 
+                  className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.01] group"
+                  style={{ animationDelay: `${index * 100}ms` }}
+                >
                   <CardContent className="p-6">
-                    <div className="flex items-start justify-between mb-4">
+                    <div className="flex items-start justify-between mb-6">
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-2">
-                          <div className="flex items-center space-x-2">
-                            {(() => {
-                              const IconComponent = getCategoryIcon(event.category);
-                              return <IconComponent className="h-4 w-4 text-slate-600 dark:text-slate-400" />;
-                            })()}
-                            <h3 className="text-lg font-semibold text-slate-900 dark:text-white">
+                        <div className="flex items-center space-x-3 mb-3">
+                          <div className="flex items-center space-x-3">
+                            <div className="w-10 h-10 bg-gradient-to-r from-emerald-100 to-teal-100 dark:from-emerald-900/30 dark:to-teal-900/30 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                              {(() => {
+                                const IconComponent = getCategoryIcon(event.category);
+                                return <IconComponent className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />;
+                              })()}
+                            </div>
+                            <h3 className="text-xl font-bold text-slate-900 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
                               {event.title}
                             </h3>
                           </div>
-                          <Badge className={getStatusColor(event.status)}>
+                          <Badge className={`${getStatusColor(event.status)} px-3 py-1 text-sm font-medium border-2`}>
                             {event.status === 'completed' ? (
                               <>
-                                <CheckCircle className="h-3 w-3 mr-1" />
+                                <CheckCircle className="h-4 w-4 mr-1" />
                                 Completed
                               </>
                             ) : (
                               'Upcoming'
                             )}
                           </Badge>
-                          <Badge className={getCategoryColor(event.category)}>
+                          <Badge className={`${getCategoryColor(event.category)} px-3 py-1 text-sm font-medium border-2`}>
                             {event.category}
                           </Badge>
                         </div>
-                        <p className="text-slate-600 dark:text-slate-300 mb-3">
+                        <p className="text-slate-600 dark:text-slate-300 mb-4 text-base leading-relaxed">
                           {event.description}
                         </p>
                       </div>
                     </div>
 
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
-                      <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
-                        <CalendarIcon className="h-4 w-4" />
-                        <span>{new Date(event.date).toLocaleDateString()}</span>
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                      <div className="flex items-center space-x-3 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                        <div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+                          <CalendarIcon className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-slate-900 dark:text-white">{new Date(event.date).toLocaleDateString()}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">Date</div>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
-                        <Clock className="h-4 w-4" />
-                        <span>{event.time}</span>
+                      <div className="flex items-center space-x-3 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                        <div className="w-8 h-8 bg-gradient-to-r from-purple-100 to-purple-200 dark:from-purple-900/30 dark:to-purple-800/30 rounded-lg flex items-center justify-center">
+                          <Clock className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-slate-900 dark:text-white">{event.time}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">Time</div>
+                        </div>
                       </div>
-                      <div className="flex items-center space-x-2 text-sm text-slate-600 dark:text-slate-400">
-                        <MapPin className="h-4 w-4" />
-                        <span>{event.location}</span>
+                      <div className="flex items-center space-x-3 text-sm bg-slate-50 dark:bg-slate-800/50 rounded-lg p-3">
+                        <div className="w-8 h-8 bg-gradient-to-r from-emerald-100 to-emerald-200 dark:from-emerald-900/30 dark:to-emerald-800/30 rounded-lg flex items-center justify-center">
+                          <MapPin className="h-4 w-4 text-emerald-600 dark:text-emerald-400" />
+                        </div>
+                        <div>
+                          <div className="font-medium text-slate-900 dark:text-white">{event.location}</div>
+                          <div className="text-xs text-slate-500 dark:text-slate-400">Location</div>
+                        </div>
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
-                      <div className="flex items-center space-x-4 text-sm">
-                        <div className="flex items-center space-x-1 text-slate-600 dark:text-slate-400">
-                          <Users className="h-4 w-4" />
-                          <span>{event.participants}/{event.maxParticipants} participants</span>
+                    <div className="flex items-center justify-between pt-6 border-t border-slate-200/50 dark:border-slate-700/50">
+                      <div className="flex items-center space-x-6">
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-blue-200 dark:from-blue-900/30 dark:to-blue-800/30 rounded-lg flex items-center justify-center">
+                            <Users className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                          </div>
+                          <div>
+                            <div className="font-semibold text-slate-900 dark:text-white">
+                              {event.participants}/{event.maxParticipants}
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">participants</div>
+                          </div>
                         </div>
-                        <div className="flex items-center space-x-1 text-yellow-600 dark:text-yellow-400">
-                          <span className="font-medium">+{event.points} CIVI</span>
+                        <div className="flex items-center space-x-3">
+                          <div className="w-8 h-8 bg-gradient-to-r from-yellow-100 to-yellow-200 dark:from-yellow-900/30 dark:to-yellow-800/30 rounded-lg flex items-center justify-center">
+                            <span className="text-yellow-600 dark:text-yellow-400 font-bold text-sm">C</span>
+                          </div>
+                          <div>
+                            <div className="font-semibold text-yellow-600 dark:text-yellow-400">
+                              +{event.points} CIVI
+                            </div>
+                            <div className="text-xs text-slate-500 dark:text-slate-400">points</div>
+                          </div>
                         </div>
                       </div>
                       
                       {event.status === 'upcoming' ? (
                         <Button 
-                          className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700"
+                          className={`font-semibold px-8 py-3 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
+                            event.participants >= event.maxParticipants 
+                              ? 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed' 
+                              : 'bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 text-white'
+                          }`}
                           disabled={event.participants >= event.maxParticipants}
                         >
-                          {event.participants >= event.maxParticipants ? 'Full' : 'Register'}
+                          {event.participants >= event.maxParticipants ? (
+                            <div className="flex items-center gap-2">
+                              <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                              Full
+                            </div>
+                          ) : (
+                            'Register Now'
+                          )}
                         </Button>
                       ) : (
-                        <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300">
+                        <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 px-4 py-2 text-sm font-medium border-2 border-green-200 dark:border-green-800">
+                          <CheckCircle className="h-4 w-4 mr-1" />
                           +{event.points} CIVI Earned
                         </Badge>
                       )}

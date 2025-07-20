@@ -31,7 +31,9 @@ import {
   Clock,
   MapPin,
   ChevronUp,
-  ChevronDown
+  ChevronDown,
+  Lightbulb,
+  Star
 } from "lucide-react";
 import {
   Select,
@@ -727,61 +729,87 @@ const RedeemPoints = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header with Balance */}
-      <Card className="bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 border-yellow-200 dark:border-yellow-800">
-        <CardContent className="p-6">
+    <div className="max-w-6xl mx-auto space-y-6 p-4">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-yellow-500 via-orange-500 to-red-500 p-6 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-                Redeem Your CIVI Points
-              </h1>
-              <p className="text-slate-600 dark:text-slate-300">
-                Exchange your civic engagement points for real-world benefits or donate to causes
-              </p>
+              <h1 className="text-2xl font-bold mb-1">Redeem Your CIVI Points</h1>
+              <p className="text-yellow-100">Exchange points for benefits or donate to causes</p>
             </div>
             <div className="text-right">
-              <div className="flex items-center space-x-2 justify-end mb-1">
-                <Coins className="h-6 w-6 text-yellow-600 dark:text-yellow-400" />
-                <span className="text-3xl font-bold text-yellow-700 dark:text-yellow-300">
-                  {userPoints.toLocaleString()}
-                </span>
+              <div className="flex items-center space-x-3 justify-end">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Coins className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-white">
+                    {userPoints.toLocaleString()}
+                  </div>
+                  <div className="text-yellow-100 text-xs">CIVI Points</div>
+                </div>
               </div>
-              <p className="text-sm text-yellow-600 dark:text-yellow-400">Available CIVI Points</p>
             </div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
+      </div>
 
       {/* Toggle between Offers and NGO Donations */}
-      <div className="flex space-x-2">
+      <div className="flex space-x-3">
         <Button
           variant={!showNgoSection ? "default" : "outline"}
           onClick={() => setShowNgoSection(false)}
-          className="flex-1"
+          className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+            !showNgoSection 
+              ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white shadow-lg hover:shadow-xl' 
+              : 'border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
+          }`}
         >
-          <ShoppingBag className="h-4 w-4 mr-2" />
-          Rewards & Offers
+          <div className="w-6 h-6 bg-white/20 dark:bg-slate-800/50 rounded-lg flex items-center justify-center mr-2">
+            <ShoppingBag className="h-4 w-4" />
+          </div>
+          <div className="text-left">
+            <div className="font-bold text-sm">Rewards & Offers</div>
+            <div className="text-xs opacity-80">Exchange for benefits</div>
+          </div>
         </Button>
         <Button
           variant={showNgoSection ? "default" : "outline"}
           onClick={() => setShowNgoSection(true)}
-          className="flex-1"
+          className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 ${
+            showNgoSection 
+              ? 'bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white shadow-lg hover:shadow-xl' 
+              : 'border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
+          }`}
         >
-          <Heart className="h-4 w-4 mr-2" />
-          NGO Donations
+          <div className="w-6 h-6 bg-white/20 dark:bg-slate-800/50 rounded-lg flex items-center justify-center mr-2">
+            <Heart className="h-4 w-4" />
+          </div>
+          <div className="text-left">
+            <div className="font-bold text-sm">NGO Donations</div>
+            <div className="text-xs opacity-80">Support causes</div>
+          </div>
         </Button>
       </div>
 
       {/* Recent Activity Toggle */}
       {(userRedemptions.length > 0 || userDonations.length > 0) && (
-        <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-          <CardHeader>
+        <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
+          <CardHeader className="pb-3">
             <CardTitle className="flex items-center justify-between">
               <div className="flex items-center space-x-2">
-                <Clock className="h-5 w-5 text-slate-600 dark:text-slate-400" />
-                <span>Recent Activity</span>
-                <Badge variant="secondary" className="text-xs">
+                <div className="w-6 h-6 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg flex items-center justify-center">
+                  <Clock className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <div className="text-base font-bold text-slate-900 dark:text-white">Recent Activity</div>
+                  <div className="text-xs text-slate-500 dark:text-slate-400">Redemption & donation history</div>
+                </div>
+                <Badge className="bg-gradient-to-r from-blue-500 to-purple-500 text-white text-xs font-semibold">
                   {userRedemptions.length + userDonations.length}
                 </Badge>
               </div>
@@ -789,7 +817,7 @@ const RedeemPoints = () => {
                 variant="ghost"
                 size="sm"
                 onClick={() => setShowRecentActivity(!showRecentActivity)}
-                className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white"
+                className="text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg transition-all duration-200"
               >
                 {showRecentActivity ? (
                   <>
@@ -812,47 +840,74 @@ const RedeemPoints = () => {
                 {[...userRedemptions.map(r => ({ ...r, type: 'redemption' })), 
                   ...userDonations.map(d => ({ ...d, type: 'donation' }))]
                   .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
-                  .slice(0, 5)
-                  .map((activity) => (
-                    <div key={activity.id} className="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-700/50 rounded-lg">
+                  .slice(0, 3)
+                  .map((activity, index) => (
+                    <div 
+                      key={activity.id} 
+                      className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/50 dark:to-slate-800/50 rounded-lg border border-slate-200/50 dark:border-slate-600/50 hover:shadow-md transition-all duration-300 hover:scale-[1.02]"
+                      style={{ animationDelay: `${index * 100}ms` }}
+                    >
                       <div className="flex-1">
-                        <div className="flex items-center space-x-2 mb-1">
-                          {activity.type === 'redemption' ? (
-                            <ShoppingBag className="h-4 w-4 text-teal-600 dark:text-teal-400" />
-                          ) : (
-                            <Heart className="h-4 w-4 text-red-500" />
-                          )}
-                          <span className="font-medium text-slate-900 dark:text-white">
+                        <div className="flex items-center space-x-3 mb-2">
+                          <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${
+                            activity.type === 'redemption' 
+                              ? 'bg-gradient-to-r from-teal-100 to-blue-100 dark:from-teal-900/30 dark:to-blue-900/30' 
+                              : 'bg-gradient-to-r from-red-100 to-pink-100 dark:from-red-900/30 dark:to-pink-900/30'
+                          }`}>
+                            {activity.type === 'redemption' ? (
+                              <ShoppingBag className="h-4 w-4 text-teal-600 dark:text-teal-400" />
+                            ) : (
+                              <Heart className="h-4 w-4 text-red-500" />
+                            )}
+                          </div>
+                          <span className="font-semibold text-slate-900 dark:text-white">
                             {activity.type === 'redemption' ? activity.offer_title : activity.ngo_name}
                           </span>
-                          <Badge className={`text-xs ${
+                          <Badge className={`text-xs font-medium border-2 ${
                             activity.type === 'redemption' 
                               ? (activity.status === 'active' 
-                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300'
-                                  : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300')
-                              : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                  ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 border-green-200 dark:border-green-800'
+                                  : 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-300 border-gray-200 dark:border-gray-800')
+                              : 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300 border-red-200 dark:border-red-800'
                           }`}>
                             {activity.type === 'redemption' ? activity.status : 'Donation'}
                           </Badge>
                         </div>
-                        <div className="flex items-center space-x-4 text-sm text-slate-600 dark:text-slate-400">
+                        <div className="flex items-center space-x-6 text-sm text-slate-600 dark:text-slate-400 ml-11">
                           {activity.type === 'redemption' ? (
                             <>
-                              <span>Code: {activity.voucher_code}</span>
-                              <span>Points: {activity.points_spent}</span>
-                              <span>Expires: {new Date(activity.expires_at).toLocaleDateString()}</span>
+                              <div className="flex items-center space-x-1">
+                                <span className="font-medium">Code:</span>
+                                <span className="font-mono bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded text-xs">{activity.voucher_code}</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Coins className="h-3 w-3 text-yellow-500" />
+                                <span>{activity.points_spent} pts</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <Clock className="h-3 w-3" />
+                                <span>Expires: {new Date(activity.expires_at).toLocaleDateString()}</span>
+                              </div>
                             </>
                           ) : (
                             <>
-                              <span>Points: {activity.points_donated}</span>
-                              <span>Amount: ₹{activity.donation_amount}</span>
-                              <span>Category: {activity.ngo_category}</span>
+                              <div className="flex items-center space-x-1">
+                                <Coins className="h-3 w-3 text-yellow-500" />
+                                <span>{activity.points_donated} pts</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <span className="font-medium">₹{activity.donation_amount}</span>
+                              </div>
+                              <div className="flex items-center space-x-1">
+                                <span>{activity.ngo_category}</span>
+                              </div>
                             </>
                           )}
                         </div>
                         {activity.type === 'donation' && (
-                          <div className="mt-1 text-xs text-green-600 dark:text-green-400">
-                            💡 {activity.impact}
+                          <div className="mt-2 ml-11 text-xs text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-lg inline-block">
+                            <Lightbulb className="h-3 w-3 inline mr-1" />
+                            {activity.impact}
                           </div>
                         )}
                       </div>
@@ -861,6 +916,7 @@ const RedeemPoints = () => {
                           variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(activity.voucher_code)}
+                          className="hover:bg-teal-50 dark:hover:bg-teal-900/20 hover:text-teal-600 dark:hover:text-teal-400 hover:border-teal-300 dark:hover:border-teal-700 transition-all duration-200"
                         >
                           <Copy className="h-4 w-4" />
                         </Button>
@@ -874,24 +930,28 @@ const RedeemPoints = () => {
       )}
 
       {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4">
+      <div className="flex flex-col sm:flex-row gap-3">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+          <div className="absolute left-3 top-1/2 transform -translate-y-1/2">
+            <Search className="h-4 w-4 text-slate-400" />
+          </div>
           <Input
             placeholder={showNgoSection ? "Search NGOs..." : "Search offers..."}
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white dark:bg-slate-800"
+            className="pl-10 pr-4 py-2 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 transition-all duration-200 rounded-lg"
           />
         </div>
         <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full sm:w-48 bg-white dark:bg-slate-800">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue />
+          <SelectTrigger className="w-full sm:w-48 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-300 dark:border-slate-600 focus:border-blue-500 dark:focus:border-blue-400 focus:ring-blue-500/20 transition-all duration-200 rounded-lg py-2">
+            <div className="w-5 h-5 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg flex items-center justify-center mr-2">
+              <Filter className="h-3 w-3 text-blue-600 dark:text-blue-400" />
+            </div>
+            <SelectValue placeholder="Filter by category" />
           </SelectTrigger>
-          <SelectContent className="bg-white dark:bg-slate-800">
+          <SelectContent className="bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-slate-300 dark:border-slate-600 rounded-lg">
             {(showNgoSection ? ngoCategories : categories).map((category) => (
-              <SelectItem key={category.value} value={category.value}>
+              <SelectItem key={category.value} value={category.value} className="hover:bg-slate-100 dark:hover:bg-slate-700">
                 {category.label}
               </SelectItem>
             ))}
@@ -901,57 +961,65 @@ const RedeemPoints = () => {
 
       {!showNgoSection ? (
         // Offers Section
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredOffers.map((offer) => (
-            <Card key={offer.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow h-full flex flex-col">
-              <CardContent className="p-6 flex-1 flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredOffers.map((offer, index) => (
+            <Card 
+              key={offer.id} 
+              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group h-full flex flex-col"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardContent className="p-4 flex-1 flex flex-col">
                 {/* Header Section */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3 flex-1">
-                    <div className="w-12 h-12 bg-gradient-to-r from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <div className="w-12 h-12 bg-gradient-to-r from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300">
                       <offer.icon className="h-6 w-6 text-teal-600 dark:text-teal-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-slate-900 dark:text-white text-sm leading-tight mb-1">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base leading-tight mb-1 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
                         {offer.brand}
                       </h3>
-                      <Badge className={`${getCategoryColor(offer.category)} text-xs`} variant="secondary">
+                      <Badge className={`${getCategoryColor(offer.category)} text-xs font-medium border-2`} variant="secondary">
                         {categories.find(c => c.value === offer.category)?.label.split(' ')[0]}
                       </Badge>
                     </div>
                   </div>
-                  <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 flex-shrink-0 ml-2">
+                  <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 flex-shrink-0 ml-2 px-2 py-1 text-xs font-medium border-2 border-green-200 dark:border-green-800">
                     {offer.discount}
                   </Badge>
                 </div>
 
                 {/* Description Section */}
                 <div className="mb-4 flex-1">
-                  <h4 className="font-medium text-slate-900 dark:text-white mb-2">
+                  <h4 className="font-bold text-slate-900 dark:text-white mb-2 text-base">
                     {offer.title}
                   </h4>
-                  <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 leading-relaxed text-sm">
                     {offer.description}
                   </p>
                 </div>
 
                 {/* Action Section */}
-                <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700 mt-auto">
+                <div className="flex items-center justify-between pt-4 border-t border-slate-200/50 dark:border-slate-700/50 mt-auto">
                   <div className="flex items-center space-x-2">
-                    <Coins className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-                    <span className="font-semibold text-slate-900 dark:text-white">
-                      {offer.points.toLocaleString()}
-                    </span>
-                    <span className="text-sm text-slate-500 dark:text-slate-400">points</span>
+                    <div className="w-6 h-6 bg-gradient-to-r from-yellow-100 to-yellow-200 dark:from-yellow-900/30 dark:to-yellow-800/30 rounded-lg flex items-center justify-center">
+                      <Coins className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <div>
+                      <div className="font-bold text-slate-900 dark:text-white text-base">
+                        {offer.points.toLocaleString()}
+                      </div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400">points</div>
+                    </div>
                   </div>
                   <Button 
                     size="sm"
                     disabled={!canAfford(offer.points)}
                     onClick={() => handleRedeemOffer(offer)}
-                    className={`${
+                    className={`font-semibold px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
                       canAfford(offer.points) 
-                        ? 'bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-medium' 
-                        : 'bg-gray-300 dark:bg-gray-600 cursor-not-allowed'
+                        ? 'bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white' 
+                        : 'bg-slate-300 dark:bg-slate-600 text-slate-500 dark:text-slate-400 cursor-not-allowed'
                     }`}
                   >
                     {canAfford(offer.points) ? 'Redeem' : 'Insufficient'}
@@ -963,26 +1031,31 @@ const RedeemPoints = () => {
         </div>
       ) : (
         // NGO Donations Section
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredNgos.map((ngo) => (
-            <Card key={ngo.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-lg transition-shadow h-full flex flex-col">
-              <CardContent className="p-6 flex-1 flex flex-col">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          {filteredNgos.map((ngo, index) => (
+            <Card 
+              key={ngo.id} 
+              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-[1.02] group h-full flex flex-col"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardContent className="p-4 flex-1 flex flex-col">
                 {/* Header Section */}
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center space-x-3 flex-1">
-                    <div className={`w-12 h-12 bg-gradient-to-r ${ngo.color} rounded-lg flex items-center justify-center flex-shrink-0`}>
+                    <div className={`w-12 h-12 bg-gradient-to-r ${ngo.color} rounded-lg flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
                       <ngo.icon className="h-6 w-6 text-slate-600 dark:text-slate-400" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-semibold text-slate-900 dark:text-white text-sm leading-tight mb-1">
+                      <h3 className="font-bold text-slate-900 dark:text-white text-base leading-tight mb-1 group-hover:text-red-600 dark:group-hover:text-red-400 transition-colors">
                         {ngo.name}
                       </h3>
                       <div className="flex items-center space-x-2 flex-wrap">
-                        <Badge className={`${getCategoryColor(ngo.category)} text-xs`} variant="secondary">
+                        <Badge className={`${getCategoryColor(ngo.category)} text-xs font-medium border-2`} variant="secondary">
                           {ngoCategories.find(c => c.value === ngo.category)?.label}
                         </Badge>
                         {ngo.verified && (
-                          <Badge className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300 text-xs">
+                          <Badge className="bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 text-green-700 dark:text-green-300 text-xs font-medium border-2 border-green-200 dark:border-green-800">
+                            <CheckCircle className="h-3 w-3 mr-1" />
                             Verified
                           </Badge>
                         )}
@@ -990,9 +1063,9 @@ const RedeemPoints = () => {
                     </div>
                   </div>
                   <div className="text-right flex-shrink-0 ml-2">
-                    <div className="flex items-center space-x-1">
-                      <span className="text-sm font-medium text-slate-900 dark:text-white">{ngo.rating}</span>
-                      <span className="text-yellow-500">★</span>
+                    <div className="flex items-center space-x-1 mb-1">
+                      <span className="text-base font-bold text-slate-900 dark:text-white">{ngo.rating}</span>
+                      <Star className="h-4 w-4 text-yellow-500 fill-current" />
                     </div>
                     <p className="text-xs text-slate-500 dark:text-slate-400">
                       {ngo.totalDonations.toLocaleString()} donors
@@ -1002,28 +1075,28 @@ const RedeemPoints = () => {
 
                 {/* Description Section */}
                 <div className="mb-4 flex-1">
-                  <p className="text-sm text-slate-600 dark:text-slate-300 mb-3 leading-relaxed">
+                  <p className="text-slate-600 dark:text-slate-300 mb-3 leading-relaxed text-sm">
                     {ngo.description}
                   </p>
-                  <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg border border-green-100 dark:border-green-800">
-                    <p className="text-sm font-medium text-green-700 dark:text-green-300 flex items-start">
-                      <span className="mr-2 mt-0.5">💡</span>
+                  <div className="bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 p-3 rounded-lg border border-green-200 dark:border-green-800">
+                    <p className="text-xs font-semibold text-green-700 dark:text-green-300 flex items-start">
+                      <Lightbulb className="h-3 w-3 mr-2 mt-0.5 flex-shrink-0" />
                       <span>Impact: {ngo.impact}</span>
                     </p>
                   </div>
                 </div>
 
                 {/* Donation Details Section */}
-                <div className="space-y-3 pt-4 border-t border-slate-200 dark:border-slate-700 mt-auto">
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-400">Points to Donation:</span>
-                    <span className="font-medium text-slate-900 dark:text-white">
+                <div className="space-y-3 pt-4 border-t border-slate-200/50 dark:border-slate-700/50 mt-auto">
+                  <div className="flex items-center justify-between text-xs bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg">
+                    <span className="text-slate-600 dark:text-slate-400 font-medium">Points to Donation:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {ngo.pointsToDonation} pts = ₹{ngo.pointsToDonation / 2}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between text-sm">
-                    <span className="text-slate-600 dark:text-slate-400">Range:</span>
-                    <span className="font-medium text-slate-900 dark:text-white">
+                  <div className="flex items-center justify-between text-xs bg-slate-50 dark:bg-slate-800/50 p-2 rounded-lg">
+                    <span className="text-slate-600 dark:text-slate-400 font-medium">Range:</span>
+                    <span className="font-bold text-slate-900 dark:text-white">
                       {ngo.minPoints} - {ngo.maxPoints} pts
                     </span>
                   </div>
@@ -1031,7 +1104,7 @@ const RedeemPoints = () => {
                     size="sm"
                     onClick={() => handleDonationClick(ngo)}
                     disabled={!canAfford(ngo.minPoints)}
-                    className="w-full bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-medium"
+                    className="w-full bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700 text-white font-semibold py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
                   >
                     <Heart className="h-4 w-4 mr-2" />
                     {canAfford(ngo.minPoints) ? 'Donate Now' : 'Insufficient Points'}
@@ -1044,15 +1117,26 @@ const RedeemPoints = () => {
       )}
 
       {((!showNgoSection && filteredOffers.length === 0) || (showNgoSection && filteredNgos.length === 0)) && (
-        <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
           <CardContent className="p-8 text-center">
-            <Search className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+            <div className="w-16 h-16 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700/50 dark:to-slate-800/50 rounded-full flex items-center justify-center mx-auto mb-4">
+              <Search className="h-8 w-8 text-slate-400" />
+            </div>
+            <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">
               No {showNgoSection ? 'NGOs' : 'offers'} found
             </h3>
-            <p className="text-slate-600 dark:text-slate-400">
+            <p className="text-slate-600 dark:text-slate-400 mb-4 max-w-md mx-auto text-sm">
               Try adjusting your search terms or category filter.
             </p>
+            <Button 
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedCategory("all");
+              }}
+              className="bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white font-semibold px-4 py-2 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105"
+            >
+              Clear Filters
+            </Button>
           </CardContent>
         </Card>
       )}

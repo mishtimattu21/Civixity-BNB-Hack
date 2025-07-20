@@ -26,8 +26,8 @@ const ChatBot = () => {
   const [inputValue, setInputValue] = useState("");
   const [isTyping, setIsTyping] = useState(false);
   const [user, setUser] = useState(null);
-  const [chatWidth, setChatWidth] = useState(320); // px, initial width
-  const [chatHeight, setChatHeight] = useState(384); // px, initial height (24rem)
+  const [chatWidth, setChatWidth] = useState(450); // px, initial width (increased from 320)
+  const [chatHeight, setChatHeight] = useState(550); // px, initial height (increased from 384)
   const [isResizing, setIsResizing] = useState(false);
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0 });
   const [resizeDirection, setResizeDirection] = useState(null);
@@ -59,16 +59,16 @@ const ChatBot = () => {
       let newWidth = chatWidth;
       let newHeight = chatHeight;
       if (resizeDirection.includes('right')) {
-        newWidth = Math.max(280, resizeStart.width + (e.clientX - resizeStart.x));
+        newWidth = Math.max(350, resizeStart.width + (e.clientX - resizeStart.x));
       }
       if (resizeDirection.includes('left')) {
-        newWidth = Math.max(280, resizeStart.width - (e.clientX - resizeStart.x));
+        newWidth = Math.max(350, resizeStart.width - (e.clientX - resizeStart.x));
       }
       if (resizeDirection.includes('bottom')) {
-        newHeight = Math.max(320, resizeStart.height + (e.clientY - resizeStart.y));
+        newHeight = Math.max(400, resizeStart.height + (e.clientY - resizeStart.y));
       }
       if (resizeDirection.includes('top')) {
-        newHeight = Math.max(320, resizeStart.height - (e.clientY - resizeStart.y));
+        newHeight = Math.max(400, resizeStart.height - (e.clientY - resizeStart.y));
       }
       setChatWidth(newWidth);
       setChatHeight(newHeight);
@@ -199,7 +199,7 @@ const ChatBot = () => {
       {isOpen && (
         <Card
           className="fixed bottom-6 right-6 bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 shadow-2xl z-50 flex flex-col animate-in slide-in-from-bottom-4 duration-300"
-          style={{ width: chatWidth, height: chatHeight, minWidth: 280, minHeight: 320 }}
+          style={{ width: chatWidth, height: chatHeight, minWidth: 350, minHeight: 400 }}
         >
           {/* Chat Header */}
           <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-700 bg-gradient-to-r from-teal-500 to-blue-600 text-white rounded-t-lg">

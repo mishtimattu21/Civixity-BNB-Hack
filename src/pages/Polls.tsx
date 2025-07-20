@@ -276,47 +276,119 @@ const Polls = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">City Polls</h1>
-          <p className="text-slate-600 dark:text-slate-300">Participate in civic polls and make your voice heard in Kochi!</p>
+    <div className="max-w-6xl mx-auto space-y-8 p-4">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-green-500 via-emerald-500 to-teal-500 p-6 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold mb-1">City Polls</h1>
+              <p className="text-green-100 text-sm">Participate in civic polls and make your voice heard in Kochi!</p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center space-x-2 justify-end">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                  <ThumbsUp className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-white">
+                    {polls.length}
+                  </div>
+                  <div className="text-green-100 text-xs">Total Polls</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div className="mt-4 lg:mt-0 flex items-center gap-2">
-          <Input
-            placeholder="Search polls..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-64"
-          />
-          <Search className="h-5 w-5 text-slate-400" />
-        </div>
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
       </div>
+
+      {/* Search Section */}
+      <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search polls by question or location..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-10 bg-white/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-600/50 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
+              />
+            </div>
+            <div className="flex items-center space-x-4 text-sm text-slate-600 dark:text-slate-400">
+              <div className="flex items-center space-x-2 bg-green-100 dark:bg-green-900/30 px-3 py-2 rounded-lg">
+                <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                <span className="font-medium">{activePolls.length} Active</span>
+              </div>
+              <div className="flex items-center space-x-2 bg-slate-100 dark:bg-slate-800/50 px-3 py-2 rounded-lg">
+                <div className="w-2 h-2 bg-slate-500 rounded-full"></div>
+                <span className="font-medium">{endedPolls.length} Ended</span>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Active Polls */}
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4">Active Polls</h2>
+        <div className="flex items-center space-x-3 mb-6">
+          <div className="w-8 h-8 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg flex items-center justify-center">
+            <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Active Polls</h2>
+            <div className="text-sm text-slate-500 dark:text-slate-400">Cast your vote on current civic issues</div>
+          </div>
+          <Badge className="bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-semibold">
+            {activePolls.length}
+          </Badge>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {activePolls.length === 0 && <div className="text-slate-500">No active polls found.</div>}
-          {activePolls.map((poll) => (
-            <Card key={poll.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-              <CardHeader>
-                <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
-                  <MapPin className="h-4 w-4 text-blue-500" />
-                  {poll.location}
-                </CardTitle>
-                <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                  Posted {formatDistanceToNow(new Date(poll.created_at), { addSuffix: true })}
+          {activePolls.length === 0 && (
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-slate-400" />
                 </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Active Polls</h3>
+                <p className="text-slate-600 dark:text-slate-400">Check back later for new civic polls!</p>
+              </CardContent>
+            </Card>
+          )}
+          {activePolls.map((poll, index) => (
+            <Card 
+              key={poll.id} 
+              className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-105"
+              style={{ animationDelay: `${index * 100}ms` }}
+            >
+              <CardHeader className="pb-4">
+                <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg flex items-center justify-center">
+                    <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="font-bold">{poll.location}</div>
+                    <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                      Posted {formatDistanceToNow(new Date(poll.created_at), { addSuffix: true })}
+                    </div>
+                  </div>
+                </CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="font-medium text-slate-900 dark:text-white mb-2">{poll.question}</div>
-                <div className="flex flex-col gap-2 mb-4">
+                <div className="font-bold text-slate-900 dark:text-white mb-4 text-lg">{poll.question}</div>
+                <div className="flex flex-col gap-3 mb-6">
                   {["Yes", "No", "Other"].map((option) => (
-                    <div key={option} className="flex flex-col gap-1">
+                    <div key={option} className="flex flex-col gap-2">
                       <Button
                         variant={votes[poll.id] === option ? 'default' : 'outline'}
-                        className="justify-start"
+                        className={`justify-start h-12 text-base font-medium transition-all duration-300 ${
+                          votes[poll.id] === option 
+                            ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 shadow-lg' 
+                            : 'hover:shadow-md'
+                        }`}
                         onClick={async () => {
                           // If double-click just removed the vote, allow immediate re-vote
                           if (votes[poll.id] === option) return;
@@ -354,32 +426,37 @@ const Polls = () => {
                         }}
                       >
                         {option}
-                        {votes[poll.id] === option && <CheckCircle className="h-4 w-4 ml-2 text-green-500" />}
+                        {votes[poll.id] === option && (
+                          <CheckCircle className="h-5 w-5 ml-2 text-white" />
+                        )}
                       </Button>
                       {/* Show input for Other if not voted, or if switching to Other */}
                       {option === 'Other' && (!votes[poll.id] || votes[poll.id] === 'Other') && (
                         <div className="flex gap-2 mt-2">
                           <Input
-                            placeholder="Please specify..."
+                            placeholder="Please specify your response..."
                             value={otherText[poll.id] || ''}
                             onChange={e => setOtherText(prev => ({ ...prev, [poll.id]: e.target.value }))}
-                            className="w-48"
+                            className="flex-1 bg-white/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-600/50 focus:ring-2 focus:ring-green-500/20 transition-all duration-300"
                             disabled={votes[poll.id] && votes[poll.id] !== 'Other'}
                           />
                           <Button
                             onClick={() => handleVote(poll.id, 'Other', otherText[poll.id])}
                             disabled={!otherText[poll.id] || otherText[poll.id].trim() === ''}
+                            className="bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700"
                           >
                             Submit
                           </Button>
                         </div>
                       )}
                       {option === 'Other' && otherError[poll.id] && (
-                        <div className="text-red-500 text-xs mt-1">{otherError[poll.id]}</div>
+                        <div className="text-red-500 text-xs mt-1 bg-red-50 dark:bg-red-900/20 px-3 py-2 rounded-lg">
+                          {otherError[poll.id]}
+                        </div>
                       )}
                       {/* If user voted 'Other', show their response with double click to remove */}
                       {option === 'Other' && votes[poll.id] === 'Other' && (
-                        <div className="mt-2 text-xs text-slate-500">
+                        <div className="mt-2 text-xs text-slate-500 bg-slate-100 dark:bg-slate-800/50 px-3 py-2 rounded-lg">
                           <span
                             className="cursor-pointer underline"
                             title="Double click to remove your response"
@@ -393,7 +470,8 @@ const Polls = () => {
                   ))}
                 </div>
                 {votes[poll.id] && (
-                  <div className="text-green-600 dark:text-green-400 font-medium flex items-center gap-2">
+                  <div className="text-green-600 dark:text-green-400 font-bold flex items-center gap-2 bg-green-50 dark:bg-green-900/20 px-4 py-3 rounded-lg">
+                    <CheckCircle className="h-5 w-5" />
                     Thank you for voting!
                   </div>
                 )}
@@ -405,62 +483,108 @@ const Polls = () => {
 
       {/* Ended Polls */}
       <div>
-        <h2 className="text-xl font-semibold text-slate-900 dark:text-white mb-4 mt-8">Ended Polls</h2>
+        <div className="flex items-center space-x-3 mb-6 mt-8">
+          <div className="w-8 h-8 bg-gradient-to-r from-slate-100 to-gray-100 dark:from-slate-900/30 dark:to-gray-900/30 rounded-lg flex items-center justify-center">
+            <Clock className="h-4 w-4 text-slate-600 dark:text-slate-400" />
+          </div>
+          <div>
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white">Ended Polls</h2>
+            <div className="text-sm text-slate-500 dark:text-slate-400">View results from completed civic polls</div>
+          </div>
+          <Badge className="bg-gradient-to-r from-slate-500 to-gray-500 text-white text-xs font-semibold">
+            {endedPolls.length}
+          </Badge>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {endedPolls.length === 0 && <div className="text-slate-500">No ended polls found.</div>}
-          {endedPolls.map((poll) => {
+          {endedPolls.length === 0 && (
+            <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+              <CardContent className="p-8 text-center">
+                <div className="w-16 h-16 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-8 w-8 text-slate-400" />
+                </div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white mb-2">No Ended Polls</h3>
+                <p className="text-slate-600 dark:text-slate-400">Results will appear here once polls are completed!</p>
+              </CardContent>
+            </Card>
+          )}
+          {endedPolls.map((poll, index) => {
             const pollResults = results[poll.id] || {};
             const totalVotes = Object.values(pollResults).reduce((a, b) => a + b, 0);
             const hasOtherResponses = otherResponses[poll.id] && otherResponses[poll.id].length > 0;
             return (
-              <Card key={poll.id} className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-                <CardHeader>
-                  <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-2">
-                    <MapPin className="h-4 w-4 text-blue-500" />
-                    {poll.location}
+              <Card 
+                key={poll.id} 
+                className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-105"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <CardHeader className="pb-4">
+                  <CardTitle className="text-lg text-slate-900 dark:text-white flex items-center gap-3">
+                    <div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg flex items-center justify-center">
+                      <MapPin className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                    </div>
+                    <div>
+                      <div className="font-bold">{poll.location}</div>
+                      <div className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        Posted {formatDistanceToNow(new Date(poll.created_at), { addSuffix: true })}
+                      </div>
+                    </div>
                   </CardTitle>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                    Posted {formatDistanceToNow(new Date(poll.created_at), { addSuffix: true })}
-                  </div>
-                  <div className="text-xs text-yellow-600 dark:text-yellow-400 mt-1 flex items-center gap-1">
-                    <Clock className="h-4 w-4" /> Poll Ended
+                  <div className="flex items-center space-x-2 mt-2">
+                    <div className="w-6 h-6 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 rounded-lg flex items-center justify-center">
+                      <Clock className="h-3 w-3 text-yellow-600 dark:text-yellow-400" />
+                    </div>
+                    <span className="text-xs text-yellow-600 dark:text-yellow-400 font-medium">Poll Ended</span>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  <div className="font-medium text-slate-900 dark:text-white mb-2">{poll.question}</div>
-                  <div className="space-y-2">
+                  <div className="font-bold text-slate-900 dark:text-white mb-4 text-lg">{poll.question}</div>
+                  <div className="space-y-3 mb-4">
                     {["Yes", "No", "Other"].map((option) => (
-                      <div key={option} className="flex items-center gap-2">
-                        <Badge className="min-w-[60px] justify-center" variant="outline">{option}</Badge>
-                        <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded h-2">
+                      <div key={option} className="flex items-center gap-3">
+                        <Badge className="min-w-[60px] justify-center bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 font-medium" variant="outline">
+                          {option}
+                        </Badge>
+                        <div className="flex-1 bg-slate-200 dark:bg-slate-700 rounded-full h-3 overflow-hidden">
                           <div
-                            className="bg-blue-500 h-2 rounded"
+                            className="bg-gradient-to-r from-blue-500 to-indigo-600 h-3 rounded-full transition-all duration-1000"
                             style={{ width: `${((pollResults[option] || 0) / (totalVotes || 1)) * 100}%` }}
                           />
                         </div>
-                        <span className="text-xs text-slate-700 dark:text-slate-300">{pollResults[option] || 0} votes</span>
+                        <span className="text-sm text-slate-700 dark:text-slate-300 font-medium min-w-[60px] text-right">
+                          {pollResults[option] || 0} votes
+                        </span>
                       </div>
                     ))}
                   </div>
-                  <div className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium bg-slate-100 dark:bg-slate-800/50 px-4 py-2 rounded-lg text-center">
                     Total votes: {totalVotes}
                   </div>
                 </CardContent>
                 {showOtherResponses[poll.id] && hasOtherResponses && (
-                  <div className="mt-4 border-t pt-3">
-                    <div className="font-semibold mb-2">Other Responses:</div>
+                  <div className="mt-4 border-t border-slate-200/50 dark:border-slate-700/50 pt-4">
+                    <div className="font-bold mb-3 text-slate-900 dark:text-white">Other Responses:</div>
                     <div className="space-y-3">
                       {otherResponses[poll.id].map((resp) => (
-                        <div key={resp.id} className="bg-slate-100 dark:bg-slate-700 rounded p-3 flex flex-col md:flex-row md:items-center md:justify-between">
-                          <div className="mb-2 md:mb-0 flex-1">
-                            <div className="text-slate-900 dark:text-white">{resp.other_text}</div>
-                            <div className="text-xs text-slate-500">By User {resp.user_id.slice(0, 6)}... at {formatDistanceToNow(new Date(resp.created_at), { addSuffix: true })}</div>
+                        <div key={resp.id} className="bg-slate-100 dark:bg-slate-700/50 rounded-lg p-4 flex flex-col md:flex-row md:items-center md:justify-between">
+                          <div className="mb-3 md:mb-0 flex-1">
+                            <div className="text-slate-900 dark:text-white font-medium">{resp.other_text}</div>
+                            <div className="text-xs text-slate-500 mt-1">By User {resp.user_id.slice(0, 6)}... at {formatDistanceToNow(new Date(resp.created_at), { addSuffix: true })}</div>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Button variant={otherLikes[resp.id]?.userType === 'like' ? 'default' : 'outline'} size="sm" onClick={() => handleOtherLike(resp.id, 'like')}>
+                            <Button 
+                              variant={otherLikes[resp.id]?.userType === 'like' ? 'default' : 'outline'} 
+                              size="sm" 
+                              onClick={() => handleOtherLike(resp.id, 'like')}
+                              className={otherLikes[resp.id]?.userType === 'like' ? 'bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700' : ''}
+                            >
                               <ThumbsUp className="h-4 w-4 mr-1" /> {otherLikes[resp.id]?.like || 0}
                             </Button>
-                            <Button variant={otherLikes[resp.id]?.userType === 'dislike' ? 'default' : 'outline'} size="sm" onClick={() => handleOtherLike(resp.id, 'dislike')}>
+                            <Button 
+                              variant={otherLikes[resp.id]?.userType === 'dislike' ? 'default' : 'outline'} 
+                              size="sm" 
+                              onClick={() => handleOtherLike(resp.id, 'dislike')}
+                              className={otherLikes[resp.id]?.userType === 'dislike' ? 'bg-gradient-to-r from-red-500 to-pink-600 hover:from-red-600 hover:to-pink-700' : ''}
+                            >
                               <ThumbsDown className="h-4 w-4 mr-1" /> {otherLikes[resp.id]?.dislike || 0}
                             </Button>
                           </div>
@@ -473,10 +597,10 @@ const Polls = () => {
                   <Button
                     variant="ghost"
                     size="sm"
-                    className="mt-4"
+                    className="mt-4 w-full bg-slate-100 dark:bg-slate-800/50 hover:bg-slate-200 dark:hover:bg-slate-700/50"
                     onClick={() => setShowOtherResponses(prev => ({ ...prev, [poll.id]: !prev[poll.id] }))}
                   >
-                    <Eye className="h-4 w-4 mr-1" />
+                    <Eye className="h-4 w-4 mr-2" />
                     {showOtherResponses[poll.id] ? 'Hide' : 'View'} Other Responses
                   </Button>
                 )}

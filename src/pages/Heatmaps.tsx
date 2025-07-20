@@ -125,46 +125,67 @@ const Heatmaps = () => {
   }, []);
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-            City Insights & Heatmaps
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            Real-time civic data visualization and analytics
-          </p>
+    <div className="max-w-6xl mx-auto space-y-8 p-4">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 p-6 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold mb-1">City Insights & Heatmaps</h1>
+              <p className="text-blue-100">Real-time civic data visualization</p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center space-x-3 justify-end">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center">
+                  <Map className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-white">
+                    {issueTypeData.reduce((sum, item) => sum + item.value, 0)}
+                  </div>
+                  <div className="text-blue-100 text-xs">Total Reports</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Interactive Heatmap */}
         <div className="lg:col-span-2 h-full flex flex-col">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 flex-1 flex flex-col">
-            <CardHeader>
-              <CardTitle className="flex items-center space-x-2 text-slate-900 dark:text-white">
-                <Map className="h-5 w-5" />
-                <span>City Heatmap</span>
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300 flex-1 flex flex-col">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-3 text-slate-900 dark:text-white">
+                <div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 rounded-lg flex items-center justify-center">
+                  <Map className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                </div>
+                <div>
+                  <div className="text-xl font-bold">City Heatmap</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400">Interactive civic issue visualization</div>
+                </div>
               </CardTitle>
             </CardHeader>
             <CardContent className="flex-1 flex flex-col p-0">
               {/* Map Layer Controls */}
-              <div className="flex flex-wrap gap-2 mb-4 p-4 pb-0">
+              <div className="flex flex-wrap gap-3 mb-6 p-6 pb-0">
                 {mapLayers.map((layer) => (
                   <Button
                     key={layer.id}
                     variant={selectedLayer === layer.id ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedLayer(layer.id)}
-                    className={`${
+                    className={`font-semibold px-4 py-2 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-105 ${
                       selectedLayer === layer.id 
-                        ? 'bg-gradient-to-r from-teal-500 to-blue-600' 
-                        : ''
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-500 hover:from-blue-600 hover:to-purple-600 text-white' 
+                        : 'border-2 border-slate-300 dark:border-slate-600 hover:bg-slate-50 dark:hover:bg-slate-700'
                     }`}
                   >
                     <div 
-                      className="w-3 h-3 rounded-full mr-2" 
+                      className="w-4 h-4 rounded-full mr-2 shadow-sm" 
                       style={{ backgroundColor: layer.color }}
                     />
                     {layer.label}
@@ -196,43 +217,59 @@ const Heatmaps = () => {
         </div>
 
         {/* Quick Stats */}
-        <div className="space-y-4">
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">Live Statistics</CardTitle>
+        <div className="space-y-6">
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-3 text-slate-900 dark:text-white">
+                <div className="w-8 h-8 bg-gradient-to-r from-green-100 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/30 rounded-lg flex items-center justify-center">
+                  <BarChart3 className="h-4 w-4 text-green-600 dark:text-green-400" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold">Live Statistics</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400">Real-time metrics</div>
+                </div>
+              </CardTitle>
             </CardHeader>
-            <CardContent className="space-y-4">
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600 dark:text-slate-400">Total Reports</span>
-                <span className="text-xl font-bold text-slate-900 dark:text-white">1,247</span>
+            <CardContent className="space-y-6">
+              <div className="flex items-center justify-between p-3 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/50 dark:to-slate-800/50 rounded-lg">
+                <span className="text-sm font-medium text-slate-600 dark:text-slate-400">Total Reports</span>
+                <span className="text-2xl font-bold text-slate-900 dark:text-white">1,247</span>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600 dark:text-slate-400">Resolved</span>
+              <div className="flex items-center justify-between p-3 bg-gradient-to-r from-green-50 to-emerald-50 dark:from-green-900/20 dark:to-emerald-900/20 rounded-lg border border-green-200 dark:border-green-800">
+                <span className="text-sm font-medium text-green-700 dark:text-green-300">Resolved</span>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold text-green-600 dark:text-green-400">1,089</span>
-                  <CheckCircle className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-2xl font-bold text-green-600 dark:text-green-400">1,089</span>
+                  <CheckCircle className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600 dark:text-slate-400">Pending</span>
+              <div className="flex items-center justify-between p-3 bg-gradient-to-r from-yellow-50 to-orange-50 dark:from-yellow-900/20 dark:to-orange-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800">
+                <span className="text-sm font-medium text-yellow-700 dark:text-yellow-300">Pending</span>
                 <div className="flex items-center space-x-2">
-                  <span className="text-xl font-bold text-yellow-600 dark:text-yellow-400">158</span>
-                  <Clock className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
+                  <span className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">158</span>
+                  <Clock className="h-5 w-5 text-yellow-600 dark:text-yellow-400" />
                 </div>
               </div>
-              <div className="flex items-center justify-between">
-                <span className="text-sm text-slate-600 dark:text-slate-400">Avg. Resolution</span>
+              <div className="flex items-center justify-between p-3 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">Avg. Resolution</span>
                 <div className="flex items-center space-x-2">
-                  <span className="text-lg font-bold text-blue-600 dark:text-blue-400">3.2 days</span>
-                  <TrendingDown className="h-4 w-4 text-green-600 dark:text-green-400" />
+                  <span className="text-xl font-bold text-blue-600 dark:text-blue-400">3.2 days</span>
+                  <TrendingDown className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
               </div>
             </CardContent>
           </Card>
 
-          <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-            <CardHeader>
-              <CardTitle className="text-slate-900 dark:text-white">Issue Types</CardTitle>
+          <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <CardHeader className="pb-4">
+              <CardTitle className="flex items-center space-x-3 text-slate-900 dark:text-white">
+                <div className="w-8 h-8 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-900/30 dark:to-pink-900/30 rounded-lg flex items-center justify-center">
+                  <Layers className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+                </div>
+                <div>
+                  <div className="text-lg font-bold">Issue Types</div>
+                  <div className="text-sm text-slate-500 dark:text-slate-400">Distribution breakdown</div>
+                </div>
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={200}>
@@ -241,27 +278,37 @@ const Heatmaps = () => {
                     data={issueTypeData}
                     cx="50%"
                     cy="50%"
-                    outerRadius={60}
+                    outerRadius={70}
                     dataKey="value"
+                    strokeWidth={2}
+                    stroke="#fff"
                   >
                     {issueTypeData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
-                  <Tooltip />
+                  <Tooltip 
+                    contentStyle={{ 
+                      backgroundColor: 'rgb(30 41 59)',
+                      border: 'none',
+                      borderRadius: '12px',
+                      color: 'white',
+                      boxShadow: '0 10px 25px rgba(0,0,0,0.2)'
+                    }}
+                  />
                 </PieChart>
               </ResponsiveContainer>
-              <div className="space-y-2 mt-4">
-                {issueTypeData.map((item) => (
-                  <div key={item.name} className="flex items-center justify-between text-sm">
-                    <div className="flex items-center space-x-2">
+              <div className="space-y-3 mt-6">
+                {issueTypeData.map((item, index) => (
+                  <div key={item.name} className="flex items-center justify-between p-2 bg-slate-50 dark:bg-slate-800/50 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700/50 transition-colors">
+                    <div className="flex items-center space-x-3">
                       <div 
-                        className="w-3 h-3 rounded-full" 
+                        className="w-4 h-4 rounded-full shadow-sm" 
                         style={{ backgroundColor: item.color }}
                       />
-                      <span className="text-slate-600 dark:text-slate-400">{item.name}</span>
+                      <span className="text-sm font-medium text-slate-700 dark:text-slate-300">{item.name}</span>
                     </div>
-                    <span className="font-medium text-slate-900 dark:text-white">{item.value}</span>
+                    <span className="font-bold text-slate-900 dark:text-white">{item.value}</span>
                   </div>
                 ))}
               </div>
@@ -271,26 +318,35 @@ const Heatmaps = () => {
       </div>
 
       {/* Department Performance */}
-      <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-slate-900 dark:text-white">
-            <BarChart3 className="h-5 w-5" />
-            <span>Department Resolution Rates</span>
+      <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center space-x-3 text-slate-900 dark:text-white">
+            <div className="w-8 h-8 bg-gradient-to-r from-orange-100 to-red-100 dark:from-orange-900/30 dark:to-red-900/30 rounded-lg flex items-center justify-center">
+              <BarChart3 className="h-4 w-4 text-orange-600 dark:text-orange-400" />
+            </div>
+            <div>
+              <div className="text-xl font-bold">Department Resolution Rates</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">Performance metrics by department</div>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {departmentData.map((dept) => (
-              <div key={dept.department} className="text-center">
-                <div className="mb-2">
-                  <div className={`text-2xl font-bold ${getResolutionColor(getResolutionRate(dept.resolved, dept.total))}`}>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+            {departmentData.map((dept, index) => (
+              <div 
+                key={dept.department} 
+                className="text-center p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-700/50 dark:to-slate-800/50 rounded-xl border border-slate-200/50 dark:border-slate-600/50 hover:shadow-lg transition-all duration-300 hover:scale-105"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <div className="mb-3">
+                  <div className={`text-3xl font-bold ${getResolutionColor(getResolutionRate(dept.resolved, dept.total))}`}>
                     {getResolutionRate(dept.resolved, dept.total)}%
                   </div>
-                  <div className="text-sm text-slate-600 dark:text-slate-400">
+                  <div className="text-sm text-slate-600 dark:text-slate-400 font-medium">
                     {dept.resolved}/{dept.total}
                   </div>
                 </div>
-                <div className="text-xs font-medium text-slate-900 dark:text-white">
+                <div className="text-sm font-semibold text-slate-900 dark:text-white leading-tight">
                   {dept.department}
                 </div>
               </div>
@@ -300,43 +356,56 @@ const Heatmaps = () => {
       </Card>
 
       {/* Trend Analysis */}
-      <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-        <CardHeader>
-          <CardTitle className="flex items-center space-x-2 text-slate-900 dark:text-white">
-            <TrendingUp className="h-5 w-5" />
-            <span>Monthly Trends</span>
+      <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
+        <CardHeader className="pb-4">
+          <CardTitle className="flex items-center space-x-3 text-slate-900 dark:text-white">
+            <div className="w-8 h-8 bg-gradient-to-r from-cyan-100 to-blue-100 dark:from-cyan-900/30 dark:to-blue-900/30 rounded-lg flex items-center justify-center">
+              <TrendingUp className="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+            </div>
+            <div>
+              <div className="text-xl font-bold">Monthly Trends</div>
+              <div className="text-sm text-slate-500 dark:text-slate-400">Reports vs resolution over time</div>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={300}>
             <LineChart data={trendData}>
-              <CartesianGrid strokeDasharray="3 3" className="opacity-30" />
+              <CartesianGrid strokeDasharray="3 3" className="opacity-20" />
               <XAxis 
                 dataKey="month" 
                 className="text-slate-600 dark:text-slate-400"
+                tick={{ fontSize: 12, fontWeight: 500 }}
               />
-              <YAxis className="text-slate-600 dark:text-slate-400" />
+              <YAxis className="text-slate-600 dark:text-slate-400" tick={{ fontSize: 12, fontWeight: 500 }} />
               <Tooltip 
                 contentStyle={{ 
                   backgroundColor: 'rgb(30 41 59)',
                   border: 'none',
-                  borderRadius: '8px',
-                  color: 'white'
+                  borderRadius: '12px',
+                  color: 'white',
+                  boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+                  padding: '12px 16px'
                 }}
+                labelStyle={{ fontWeight: 'bold', marginBottom: '8px' }}
               />
               <Line 
                 type="monotone" 
                 dataKey="reports" 
                 stroke="#3B82F6" 
-                strokeWidth={3}
+                strokeWidth={4}
                 name="Reports"
+                dot={{ fill: '#3B82F6', strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8, stroke: '#3B82F6', strokeWidth: 2 }}
               />
               <Line 
                 type="monotone" 
                 dataKey="resolved" 
                 stroke="#10B981" 
-                strokeWidth={3}
+                strokeWidth={4}
                 name="Resolved"
+                dot={{ fill: '#10B981', strokeWidth: 2, r: 6 }}
+                activeDot={{ r: 8, stroke: '#10B981', strokeWidth: 2 }}
               />
             </LineChart>
           </ResponsiveContainer>

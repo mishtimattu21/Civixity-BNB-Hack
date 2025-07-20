@@ -208,35 +208,37 @@ const Documents = () => {
     const CategoryIcon = getCategoryIcon(document.category);
     
     return (
-      <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:shadow-md transition-shadow">
+      <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 hover:shadow-xl transition-all duration-300 hover:scale-105 group">
         <CardContent className="p-6">
           <div className="flex items-start justify-between mb-4">
-            <div className="flex items-start space-x-3 flex-1">
-              <div className="w-10 h-10 bg-gradient-to-r from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-lg flex items-center justify-center">
-                <CategoryIcon className="h-5 w-5 text-teal-600 dark:text-teal-400" />
+            <div className="flex items-start space-x-4 flex-1">
+              <div className={`w-12 h-12 bg-gradient-to-r ${getCategoryColor(document.category).replace('bg-', 'from-').replace('text-', 'to-')} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300 shadow-lg`}>
+                <CategoryIcon className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                <div className="flex items-center space-x-2 mb-2">
-                  <h3 className="font-semibold text-slate-900 dark:text-white">
+                <div className="flex items-center space-x-2 mb-3">
+                  <h3 className="font-bold text-slate-900 dark:text-white text-lg">
                     {document.title}
                   </h3>
                   {isPinned && (
-                    <Pin className="h-4 w-4 text-amber-500" />
+                    <div className="w-6 h-6 bg-gradient-to-r from-amber-400 to-orange-500 rounded-full flex items-center justify-center">
+                      <Pin className="h-3 w-3 text-white" />
+                    </div>
                   )}
                   {document.urgent && (
-                    <Badge className="bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300">
+                    <Badge className="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs font-semibold px-3 py-1">
                       Urgent
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-slate-600 dark:text-slate-300 mb-3">
+                <p className="text-slate-600 dark:text-slate-300 mb-4 leading-relaxed">
                   {document.description}
                 </p>
-                <div className="flex flex-wrap items-center gap-2">
-                  <Badge className={getCategoryColor(document.category)}>
+                <div className="flex flex-wrap items-center gap-2 mb-4">
+                  <Badge className={`${getCategoryColor(document.category)} px-3 py-1 text-xs font-medium border-2`}>
                     {categories.find(c => c.value === document.category)?.label}
                   </Badge>
-                  <Badge className={getTypeColor(document.type)}>
+                  <Badge className={`${getTypeColor(document.type)} px-3 py-1 text-xs font-medium border-2`}>
                     {document.type.charAt(0).toUpperCase() + document.type.slice(1)}
                   </Badge>
                 </div>
@@ -244,16 +246,20 @@ const Documents = () => {
             </div>
           </div>
 
-          <div className="flex items-center justify-between pt-4 border-t border-slate-200 dark:border-slate-700">
+          <div className="flex items-center justify-between pt-4 border-t border-slate-200/50 dark:border-slate-700/50">
             <div className="flex items-center space-x-4 text-sm text-slate-600 dark:text-slate-400">
-              <div className="flex items-center space-x-1">
+              <div className="flex items-center space-x-2 bg-slate-100 dark:bg-slate-800/50 px-3 py-2 rounded-lg">
                 <Calendar className="h-4 w-4" />
-                <span>{new Date(document.date).toLocaleDateString()}</span>
+                <span className="font-medium">{new Date(document.date).toLocaleDateString()}</span>
               </div>
-              <div>Size: {document.size}</div>
-              <div>{document.downloads} downloads</div>
+              <div className="bg-slate-100 dark:bg-slate-800/50 px-3 py-2 rounded-lg font-medium">
+                {document.size}
+              </div>
+              <div className="bg-slate-100 dark:bg-slate-800/50 px-3 py-2 rounded-lg font-medium">
+                {document.downloads} downloads
+              </div>
             </div>
-            <Button size="sm" className="bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700">
+            <Button size="sm" className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 shadow-lg hover:shadow-xl transition-all duration-300">
               <Download className="h-4 w-4 mr-2" />
               Download
             </Button>
@@ -264,71 +270,98 @@ const Documents = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto space-y-6">
-      {/* Header */}
-      <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
-            Documents & Announcements
-          </h1>
-          <p className="text-slate-600 dark:text-slate-300">
-            Access important civic documents and community announcements
-          </p>
+    <div className="max-w-6xl mx-auto space-y-8 p-4">
+      {/* Hero Section */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-blue-500 via-indigo-500 to-purple-500 p-6 text-white shadow-2xl">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="relative z-10">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-2xl font-bold mb-1">Documents & Announcements</h1>
+              <p className="text-blue-100 text-sm">Access important civic documents and community updates</p>
+            </div>
+            <div className="text-right">
+              <div className="flex items-center space-x-2 justify-end">
+                <div className="w-10 h-10 bg-white/20 backdrop-blur-sm rounded-lg flex items-center justify-center">
+                  <FileText className="h-5 w-5 text-white" />
+                </div>
+                <div>
+                  <div className="text-3xl font-bold text-white">
+                    {allDocuments.length}
+                  </div>
+                  <div className="text-blue-100 text-xs">Documents Available</div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
+        <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -translate-y-12 translate-x-12"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 bg-white/5 rounded-full translate-y-8 -translate-x-8"></div>
       </div>
 
       {/* Search and Filter */}
-      <div className="flex flex-col sm:flex-row gap-4">
-        <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
-          <Input
-            placeholder="Search documents..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="pl-10 bg-white dark:bg-slate-800"
-          />
-        </div>
-        <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-          <SelectTrigger className="w-full sm:w-48 bg-white dark:bg-slate-800">
-            <Filter className="h-4 w-4 mr-2" />
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent className="bg-white dark:bg-slate-800">
-            {categories.map((category) => (
-              <SelectItem key={category.value} value={category.value}>
-                {category.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-      </div>
+      <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+        <CardContent className="p-6">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <div className="flex-1 relative">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-slate-400" />
+              <Input
+                placeholder="Search documents and announcements..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="pl-10 bg-white/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-600/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300"
+              />
+            </div>
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full sm:w-48 bg-white/50 dark:bg-slate-800/50 border-slate-200/50 dark:border-slate-600/50 focus:ring-2 focus:ring-blue-500/20 transition-all duration-300">
+                <Filter className="h-4 w-4 mr-2" />
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-600/50">
+                {categories.map((category) => (
+                  <SelectItem key={category.value} value={category.value}>
+                    {category.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Pinned Documents */}
       <Collapsible 
         open={expandedSections.pinned} 
         onOpenChange={() => toggleSection('pinned')}
       >
-        <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
           <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+            <CardHeader className="cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-all duration-300">
               <CardTitle className="flex items-center justify-between text-slate-900 dark:text-white">
-                <div className="flex items-center space-x-2">
-                  <Pin className="h-5 w-5 text-amber-500" />
-                  <span>Pinned Documents</span>
-                  <Badge className="bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-300">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-amber-100 to-orange-100 dark:from-amber-900/30 dark:to-orange-900/30 rounded-lg flex items-center justify-center">
+                    <Pin className="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold">Pinned Documents</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">Important documents for quick access</div>
+                  </div>
+                  <Badge className="bg-gradient-to-r from-amber-500 to-orange-500 text-white text-xs font-semibold">
                     {pinnedDocuments.length}
                   </Badge>
                 </div>
-                {expandedSections.pinned ? (
-                  <ChevronDown className="h-5 w-5" />
-                ) : (
-                  <ChevronRight className="h-5 w-5" />
-                )}
+                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700/50 rounded-lg flex items-center justify-center transition-transform duration-300">
+                  {expandedSections.pinned ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </div>
               </CardTitle>
             </CardHeader>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               {pinnedDocuments
                 .filter(doc => {
                   const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -336,8 +369,10 @@ const Documents = () => {
                   const matchesCategory = selectedCategory === "all" || doc.category === selectedCategory;
                   return matchesSearch && matchesCategory;
                 })
-                .map((document) => (
-                  <DocumentCard key={document.id} document={document} isPinned={true} />
+                .map((document, index) => (
+                  <div key={document.id} style={{ animationDelay: `${index * 100}ms` }}>
+                    <DocumentCard document={document} isPinned={true} />
+                  </div>
                 ))}
             </CardContent>
           </CollapsibleContent>
@@ -349,27 +384,34 @@ const Documents = () => {
         open={expandedSections.recent} 
         onOpenChange={() => toggleSection('recent')}
       >
-        <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
+        <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl hover:shadow-2xl transition-all duration-300">
           <CollapsibleTrigger asChild>
-            <CardHeader className="cursor-pointer hover:bg-slate-50 dark:hover:bg-slate-700/50 transition-colors">
+            <CardHeader className="cursor-pointer hover:bg-slate-50/50 dark:hover:bg-slate-700/30 transition-all duration-300">
               <CardTitle className="flex items-center justify-between text-slate-900 dark:text-white">
-                <div className="flex items-center space-x-2">
-                  <Folder className="h-5 w-5" />
-                  <span>Recent Documents</span>
-                  <Badge className="bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                <div className="flex items-center space-x-3">
+                  <div className="w-8 h-8 bg-gradient-to-r from-blue-100 to-indigo-100 dark:from-blue-900/30 dark:to-indigo-900/30 rounded-lg flex items-center justify-center">
+                    <Folder className="h-4 w-4 text-blue-600 dark:text-blue-400" />
+                  </div>
+                  <div>
+                    <div className="text-xl font-bold">Recent Documents</div>
+                    <div className="text-sm text-slate-500 dark:text-slate-400">Latest civic documents and announcements</div>
+                  </div>
+                  <Badge className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white text-xs font-semibold">
                     {documents.length}
                   </Badge>
                 </div>
-                {expandedSections.recent ? (
-                  <ChevronDown className="h-5 w-5" />
-                ) : (
-                  <ChevronRight className="h-5 w-5" />
-                )}
+                <div className="w-8 h-8 bg-slate-100 dark:bg-slate-700/50 rounded-lg flex items-center justify-center transition-transform duration-300">
+                  {expandedSections.recent ? (
+                    <ChevronDown className="h-4 w-4" />
+                  ) : (
+                    <ChevronRight className="h-4 w-4" />
+                  )}
+                </div>
               </CardTitle>
             </CardHeader>
           </CollapsibleTrigger>
           <CollapsibleContent>
-            <CardContent className="space-y-4">
+            <CardContent className="space-y-6">
               {documents
                 .filter(doc => {
                   const matchesSearch = doc.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -377,8 +419,10 @@ const Documents = () => {
                   const matchesCategory = selectedCategory === "all" || doc.category === selectedCategory;
                   return matchesSearch && matchesCategory;
                 })
-                .map((document) => (
-                  <DocumentCard key={document.id} document={document} />
+                .map((document, index) => (
+                  <div key={document.id} style={{ animationDelay: `${index * 100}ms` }}>
+                    <DocumentCard document={document} />
+                  </div>
                 ))}
             </CardContent>
           </CollapsibleContent>
@@ -387,15 +431,26 @@ const Documents = () => {
 
       {/* No Results */}
       {filteredDocuments.length === 0 && (
-        <Card className="bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700">
-          <CardContent className="p-8 text-center">
-            <FileText className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-2">
+        <Card className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm border-slate-200/50 dark:border-slate-700/50 shadow-xl">
+          <CardContent className="p-12 text-center">
+            <div className="w-20 h-20 bg-gradient-to-r from-slate-100 to-slate-200 dark:from-slate-700 dark:to-slate-800 rounded-full flex items-center justify-center mx-auto mb-6">
+              <FileText className="h-10 w-10 text-slate-400" />
+            </div>
+            <h3 className="text-xl font-bold text-slate-900 dark:text-white mb-3">
               No documents found
             </h3>
-            <p className="text-slate-600 dark:text-slate-400">
-              Try adjusting your search terms or category filter.
+            <p className="text-slate-600 dark:text-slate-400 mb-6">
+              Try adjusting your search terms or category filter to find what you're looking for.
             </p>
+            <Button 
+              onClick={() => {
+                setSearchTerm("");
+                setSelectedCategory("all");
+              }}
+              className="bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700"
+            >
+              Clear Filters
+            </Button>
           </CardContent>
         </Card>
       )}
