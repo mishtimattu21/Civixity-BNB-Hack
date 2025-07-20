@@ -1,0 +1,558 @@
+{
+    "networks": {
+        "opBNBTestnet": {
+            "chainId": 5611,
+            "rpcUrl": "https://opbnb-testnet-rpc.bnbchain.org",
+            "explorer": "https://testnet.opbnbscan.com",
+            "currency": "tBNB",
+            "contracts": {
+                "civiToken": {
+                    "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+                    "abi": [
+                        "constructor(string name, string symbol, uint256 initialSupply, uint256 _gasReimbursementRate)",
+                        "error ERC20InsufficientAllowance(address spender, uint256 allowance, uint256 needed)",
+                        "error ERC20InsufficientBalance(address sender, uint256 balance, uint256 needed)",
+                        "error ERC20InvalidApprover(address approver)",
+                        "error ERC20InvalidReceiver(address receiver)",
+                        "error ERC20InvalidSender(address sender)",
+                        "error ERC20InvalidSpender(address spender)",
+                        "error OwnableInvalidOwner(address owner)",
+                        "error OwnableUnauthorizedAccount(address account)",
+                        "event Approval(address indexed owner, address indexed spender, uint256 value)",
+                        "event GasReimbursed(address indexed user, uint256 gasSpent, uint256 tokensReimbursed)",
+                        "event GasReimbursementRateUpdated(uint256 oldRate, uint256 newRate)",
+                        "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+                        "event Transfer(address indexed from, address indexed to, uint256 value)",
+                        "function allowance(address owner, address spender) view returns (uint256)",
+                        "function approve(address spender, uint256 value) returns (bool)",
+                        "function balanceOf(address account) view returns (uint256)",
+                        "function decimals() view returns (uint8)",
+                        "function gasReimbursementRate() view returns (uint256)",
+                        "function gasSpentByUser(address) view returns (uint256)",
+                        "function getGasSpentByUser(address user) view returns (uint256)",
+                        "function name() view returns (string)",
+                        "function owner() view returns (address)",
+                        "function reimburseGas(address user, uint256 gasSpent)",
+                        "function renounceOwnership()",
+                        "function symbol() view returns (string)",
+                        "function totalSupply() view returns (uint256)",
+                        "function transfer(address to, uint256 value) returns (bool)",
+                        "function transferFrom(address from, address to, uint256 value) returns (bool)",
+                        "function transferOwnership(address newOwner)",
+                        "function updateGasReimbursementRate(uint256 newRate)"
+                    ]
+                },
+                "issueManager": {
+                    "address": "0xe7f1725E7734CE288F8367e1Bb143E90bb3F0512",
+                    "abi": [
+                        "constructor(address _civiToken)",
+                        "error OwnableInvalidOwner(address owner)",
+                        "error OwnableUnauthorizedAccount(address account)",
+                        "event GasReimbursed(address indexed user, uint256 gasSpent, uint256 tokensReimbursed)",
+                        "event IssueCreated(uint256 indexed issueId, address indexed author, string title, uint256 gasSpent)",
+                        "event IssueVoted(uint256 indexed issueId, address indexed voter, bool isUpvote, uint256 gasSpent)",
+                        "event OwnershipTransferred(address indexed previousOwner, address indexed newOwner)",
+                        "function civiToken() view returns (address)",
+                        "function createIssue(string title, string description) returns (uint256)",
+                        "function getIssue(uint256 issueId) view returns (uint256 id, address author, string title, string description, uint256 upvotes, uint256 downvotes, uint256 createdAt)",
+                        "function getTotalIssues() view returns (uint256)",
+                        "function getUserGasSpent(address user) view returns (uint256)",
+                        "function getUserIssues(address user) view returns (uint256[])",
+                        "function getUserVote(uint256 issueId, address user) view returns (bool hasVoted, bool voteDirection)",
+                        "function issues(uint256) view returns (uint256 id, address author, string title, string description, uint256 upvotes, uint256 downvotes, uint256 createdAt, bool exists)",
+                        "function nextIssueId() view returns (uint256)",
+                        "function owner() view returns (address)",
+                        "function renounceOwnership()",
+                        "function transferOwnership(address newOwner)",
+                        "function updateCiviToken(address newCiviToken)",
+                        "function userGasSpent(address) view returns (uint256)",
+                        "function userIssues(address, uint256) view returns (uint256)",
+                        "function voteOnIssue(uint256 issueId, bool isUpvote)"
+                    ]
+                }
+            }
+        },
+        "localhost": {
+            "chainId": 5611,
+            "rpcUrl": "https://opbnb-testnet-rpc.bnbchain.org",
+            "explorer": "https://testnet.opbnbscan.com",
+            "currency": "tBNB",
+            "contracts": {
+                "civiToken": {
+                    "address": "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9",
+                    "abi": [{
+                            "inputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "constructor"
+                        },
+                        {
+                            "anonymous": false,
+                            "inputs": [{
+                                    "indexed": true,
+                                    "internalType": "address",
+                                    "name": "owner",
+                                    "type": "address"
+                                },
+                                {
+                                    "indexed": true,
+                                    "internalType": "address",
+                                    "name": "spender",
+                                    "type": "address"
+                                },
+                                {
+                                    "indexed": false,
+                                    "internalType": "uint256",
+                                    "name": "value",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "Approval",
+                            "type": "event"
+                        },
+                        {
+                            "anonymous": false,
+                            "inputs": [{
+                                    "indexed": true,
+                                    "internalType": "address",
+                                    "name": "from",
+                                    "type": "address"
+                                },
+                                {
+                                    "indexed": true,
+                                    "internalType": "address",
+                                    "name": "to",
+                                    "type": "address"
+                                },
+                                {
+                                    "indexed": false,
+                                    "internalType": "uint256",
+                                    "name": "value",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "Transfer",
+                            "type": "event"
+                        },
+                        {
+                            "inputs": [{
+                                    "internalType": "address",
+                                    "name": "owner",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "address",
+                                    "name": "spender",
+                                    "type": "address"
+                                }
+                            ],
+                            "name": "allowance",
+                            "outputs": [{
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                    "internalType": "address",
+                                    "name": "spender",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "amount",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "approve",
+                            "outputs": [{
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                "internalType": "address",
+                                "name": "account",
+                                "type": "address"
+                            }],
+                            "name": "balanceOf",
+                            "outputs": [{
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [],
+                            "name": "decimals",
+                            "outputs": [{
+                                "internalType": "uint8",
+                                "name": "",
+                                "type": "uint8"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                    "internalType": "address",
+                                    "name": "spender",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "subtractedValue",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "decreaseAllowance",
+                            "outputs": [{
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                    "internalType": "address",
+                                    "name": "spender",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "addedValue",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "increaseAllowance",
+                            "outputs": [{
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [],
+                            "name": "name",
+                            "outputs": [{
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [],
+                            "name": "owner",
+                            "outputs": [{
+                                "internalType": "address",
+                                "name": "",
+                                "type": "address"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [],
+                            "name": "renounceOwnership",
+                            "outputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [],
+                            "name": "symbol",
+                            "outputs": [{
+                                "internalType": "string",
+                                "name": "",
+                                "type": "string"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [],
+                            "name": "totalSupply",
+                            "outputs": [{
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                    "internalType": "address",
+                                    "name": "to",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "amount",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "transfer",
+                            "outputs": [{
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                    "internalType": "address",
+                                    "name": "from",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "address",
+                                    "name": "to",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "amount",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "name": "transferFrom",
+                            "outputs": [{
+                                "internalType": "bool",
+                                "name": "",
+                                "type": "bool"
+                            }],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                "internalType": "address",
+                                "name": "newOwner",
+                                "type": "address"
+                            }],
+                            "name": "transferOwnership",
+                            "outputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        }
+                    ]
+                },
+                "issueManager": {
+                    "address": "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9",
+                    "abi": [{
+                            "inputs": [{
+                                "internalType": "address",
+                                "name": "_civiToken",
+                                "type": "address"
+                            }],
+                            "stateMutability": "nonpayable",
+                            "type": "constructor"
+                        },
+                        {
+                            "anonymous": false,
+                            "inputs": [{
+                                    "indexed": true,
+                                    "internalType": "uint256",
+                                    "name": "issueId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "indexed": true,
+                                    "internalType": "address",
+                                    "name": "creator",
+                                    "type": "address"
+                                },
+                                {
+                                    "indexed": false,
+                                    "internalType": "string",
+                                    "name": "title",
+                                    "type": "string"
+                                }
+                            ],
+                            "name": "IssueCreated",
+                            "type": "event"
+                        },
+                        {
+                            "anonymous": false,
+                            "inputs": [{
+                                    "indexed": true,
+                                    "internalType": "uint256",
+                                    "name": "issueId",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "indexed": true,
+                                    "internalType": "address",
+                                    "name": "voter",
+                                    "type": "address"
+                                },
+                                {
+                                    "indexed": false,
+                                    "internalType": "bool",
+                                    "name": "isUpvote",
+                                    "type": "bool"
+                                }
+                            ],
+                            "name": "VoteCast",
+                            "type": "event"
+                        },
+                        {
+                            "inputs": [{
+                                    "internalType": "string",
+                                    "name": "_title",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "_description",
+                                    "type": "string"
+                                }
+                            ],
+                            "name": "createIssue",
+                            "outputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                "internalType": "uint256",
+                                "name": "_issueId",
+                                "type": "uint256"
+                            }],
+                            "name": "downvoteIssue",
+                            "outputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }],
+                            "name": "issues",
+                            "outputs": [{
+                                    "internalType": "string",
+                                    "name": "title",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "string",
+                                    "name": "description",
+                                    "type": "string"
+                                },
+                                {
+                                    "internalType": "address",
+                                    "name": "creator",
+                                    "type": "address"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "upvotes",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "downvotes",
+                                    "type": "uint256"
+                                },
+                                {
+                                    "internalType": "uint256",
+                                    "name": "createdAt",
+                                    "type": "uint256"
+                                }
+                            ],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                "internalType": "uint256",
+                                "name": "_issueId",
+                                "type": "uint256"
+                            }],
+                            "name": "getIssue",
+                            "outputs": [{
+                                "components": [{
+                                        "internalType": "string",
+                                        "name": "title",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "string",
+                                        "name": "description",
+                                        "type": "string"
+                                    },
+                                    {
+                                        "internalType": "address",
+                                        "name": "creator",
+                                        "type": "address"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "upvotes",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "downvotes",
+                                        "type": "uint256"
+                                    },
+                                    {
+                                        "internalType": "uint256",
+                                        "name": "createdAt",
+                                        "type": "uint256"
+                                    }
+                                ],
+                                "internalType": "struct IssueManager.Issue",
+                                "name": "",
+                                "type": "tuple"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [],
+                            "name": "getIssueCount",
+                            "outputs": [{
+                                "internalType": "uint256",
+                                "name": "",
+                                "type": "uint256"
+                            }],
+                            "stateMutability": "view",
+                            "type": "function"
+                        },
+                        {
+                            "inputs": [{
+                                "internalType": "uint256",
+                                "name": "_issueId",
+                                "type": "uint256"
+                            }],
+                            "name": "upvoteIssue",
+                            "outputs": [],
+                            "stateMutability": "nonpayable",
+                            "type": "function"
+                        }
+                    ]
+                }
+            }
+        }
+    }
+}
