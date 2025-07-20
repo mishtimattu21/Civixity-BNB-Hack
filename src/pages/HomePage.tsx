@@ -489,9 +489,21 @@ const HomePage = () => {
                 onClick={() => setSelectedStory(post)}
                 style={{ animationDelay: `${index * 100}ms` }}
               >
-                <div className="w-24 h-24 bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-2xl flex items-center justify-center mb-3 mx-auto group-hover:shadow-lg transition-all duration-300 group-hover:rotate-3">
-                  <MapPin className="h-10 w-10 text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform" />
-                </div>
+                {/* Show image if available */}
+                {post.image_url && post.image_url !== 'null' && post.image_url !== '' ? (
+                  <div className="w-24 h-24 mb-2 mx-auto rounded-2xl overflow-hidden flex items-center justify-center bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 group-hover:shadow-lg transition-all duration-300 group-hover:rotate-3">
+                    <img
+                      src={post.image_url}
+                      alt="Story"
+                      className="object-cover w-full h-full group-hover:scale-110 transition-transform duration-300"
+                      style={{ maxWidth: '100%', maxHeight: '100%' }}
+                    />
+                  </div>
+                ) : (
+                  <div className="w-24 h-24 bg-gradient-to-br from-teal-100 to-blue-100 dark:from-teal-900/50 dark:to-blue-900/50 rounded-2xl flex items-center justify-center mb-3 mx-auto group-hover:shadow-lg transition-all duration-300 group-hover:rotate-3">
+                    <MapPin className="h-10 w-10 text-teal-600 dark:text-teal-400 group-hover:scale-110 transition-transform" />
+                  </div>
+                )}
                 <div className="text-center">
                   <div className="text-sm font-semibold text-slate-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                     {post.title}

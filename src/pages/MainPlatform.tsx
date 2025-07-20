@@ -36,17 +36,17 @@ const MainPlatform = () => {
       />
       
       <div className="flex">
-        <Sidebar collapsed={sidebarCollapsed} />
-        
-        <main className={`flex-1 transition-all duration-300 ${
-          sidebarCollapsed ? 'ml-16' : 'ml-64'
-        } pt-16`}>
+        <Sidebar collapsed={sidebarCollapsed} setSidebarCollapsed={setSidebarCollapsed} />
+        <main
+          className={`flex-1 transition-all duration-300 pt-16 ${
+            sidebarCollapsed ? 'ml-0 lg:ml-16' : 'ml-0 lg:ml-64'
+          }`}
+        >
           <div className="p-6">
             <Outlet />
           </div>
         </main>
       </div>
-      
       <ChatBot />
     </div>
   );

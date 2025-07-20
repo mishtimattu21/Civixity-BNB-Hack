@@ -1,2 +1,0 @@
-image,Deepfake Detection,timestamp
-.gradio\flagged\image\7cc3799aa2573725ec79\road-with-large-pothole-middle_170984-48478.jpg,"{""label"": ""Real"", ""confidences"": [{""label"": ""Real"", ""confidence"": 0.694}, {""label"": ""Fake"", ""confidence"": 0.306}]}",2025-07-19 22:56:51.730337

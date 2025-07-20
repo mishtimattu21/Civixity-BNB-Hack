@@ -1,5 +1,4 @@
 
-import { useState } from "react";
 import { NavLink, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { 
@@ -17,11 +16,11 @@ import {
 
 interface SidebarProps {
   collapsed: boolean;
+  setSidebarCollapsed: (collapsed: boolean) => void;
 }
 
-const Sidebar = ({ collapsed }: SidebarProps) => {
+const Sidebar = ({ collapsed, setSidebarCollapsed }: SidebarProps) => {
   const location = useLocation();
-  const [isCollapsed, setIsCollapsed] = useState(collapsed);
 
   const menuItems = [
     { icon: Home, label: "Home", path: "/platform" },
@@ -44,17 +43,17 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
     <>
       {/* Desktop Sidebar */}
       <aside className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 transition-all duration-300 z-40 ${
-        isCollapsed ? 'w-16' : 'w-64'
+        collapsed ? 'w-16' : 'w-64'
       } hidden lg:block`}>
         {/* Collapse Toggle */}
         <div className="flex justify-end p-2">
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setIsCollapsed(!isCollapsed)}
+            onClick={() => setSidebarCollapsed(!collapsed)}
             className="h-8 w-8"
           >
-            {isCollapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
+            {collapsed ? <ChevronRight className="h-4 w-4" /> : <ChevronLeft className="h-4 w-4" />}
           </Button>
         </div>
 
@@ -81,7 +80,7 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
                   ) : (
                     <item.icon className="h-5 w-5 flex-shrink-0" />
                   )}
-                  {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
+                  {!collapsed && <span className="text-sm font-medium">{item.label}</span>}
                 </NavLink>
               </li>
             ))}
@@ -93,7 +92,7 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
       <div className={`lg:hidden fixed inset-0 z-50 ${collapsed ? 'hidden' : 'block'}`}>
         <div 
           className="absolute inset-0 bg-black/50"
-          onClick={() => setIsCollapsed(true)}
+          onClick={() => setSidebarCollapsed(true)}
         />
         <aside className="absolute left-0 top-0 h-full w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700">
           <div className="p-4">
@@ -109,7 +108,7 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
               <Button
                 variant="ghost"
                 size="icon"
-                onClick={() => setIsCollapsed(true)}
+                onClick={() => setSidebarCollapsed(true)}
               >
                 <ChevronLeft className="h-4 w-4" />
               </Button>
@@ -122,7 +121,7 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
                     <NavLink
                       to={item.path}
                       end={item.path === "/platform"}
-                      onClick={() => setIsCollapsed(true)}
+                      onClick={() => setSidebarCollapsed(true)}
                       className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
                         isActive(item.path)
                           ? 'bg-teal-100 dark:bg-teal-900/50 text-teal-700 dark:text-teal-300'

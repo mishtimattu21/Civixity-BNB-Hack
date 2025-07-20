@@ -1,6 +1,4 @@
-# Civixity: Next-Gen Civic Engagement Platform
-
-![Civixity Logo](public/logo.jpg)
+# <img src="public/logo.jpg" alt="Civixity Logo" height="32" style="vertical-align:middle; margin-right:8px;"/> Civixity: Next-Gen Civic Engagement Platform
 
 Civixity is a modern, AI-powered civic engagement platform for cities and communities. It empowers citizens to report issues, participate in governance, join volunteer activities, and earn rewards—all in a beautiful, gamified web experience.
 
