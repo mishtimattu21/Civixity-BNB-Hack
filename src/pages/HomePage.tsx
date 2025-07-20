@@ -24,6 +24,7 @@ import { Label } from "@/components/ui/label";
 import { supabase } from "@/lib/supabaseClient";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow, parseISO } from "date-fns";
+import { usePoints } from "@/contexts/PointsContext";
 
 const HomePage = () => {
   const [posts, setPosts] = useState<any[]>([]);
@@ -73,6 +74,7 @@ const HomePage = () => {
   });
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
+  const { addPoints, deductPoints } = usePoints();
   const [dialogOpen, setDialogOpen] = useState(false);
   const [aiDialogOpen, setAIDialogOpen] = useState(false);
   const [aiDetected, setAIDetected] = useState(false);
@@ -261,10 +263,12 @@ const HomePage = () => {
     ]);
     setUploading(false);
     if (!insertError) {
+      // Add 30 points for posting a report
+      addPoints(30);
       setNewPost({ title: "", description: "", image: null, location: "", autoDetectLocation: false, category: "Potholes", otherCategory: "", latitude: null, longitude: null });
       setDialogOpen(false);
       setPostAnonymous(false);
-      toast({ title: "Posted!", description: "Your report has been submitted." });
+      toast({ title: "Posted!", description: "Your report has been submitted. +30 points earned!" });
       // Refetch posts
       const { data, error } = await supabase
         .from('posts')
@@ -285,6 +289,9 @@ const HomePage = () => {
     // Find the post
     const post = posts.find(p => p.id === postId);
     if (!post) return;
+
+    // Check if user is voting on their own post
+    const isOwnPost = post.user_id === user?.id;
 
     let upvotes = post.upvotes;
     let downvotes = post.downvotes;
@@ -309,6 +316,12 @@ const HomePage = () => {
     const newVotes = { ...userVotes, [postId]: type };
     setUserVotes(newVotes);
     localStorage.setItem('userVotes', JSON.stringify(newVotes));
+
+    // Add 5 points for voting on someone else's post
+    if (!isOwnPost) {
+      addPoints(5);
+      toast({ title: "Vote recorded!", description: `+5 points for ${type === 'up' ? 'upvoting' : 'downvoting'} this post!` });
+    }
   };
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -317,10 +330,22 @@ const HomePage = () => {
   // Handle deleting a post
   const handleDeletePost = async () => {
     if (!postToDelete) return;
+    
+    // Find the post to check if it belongs to the current user
+    const post = posts.find(p => p.id === postToDelete);
+    const isOwnPost = post && post.user_id === user?.id;
+    
     const { error } = await supabase.from('posts').delete().eq('id', postToDelete);
     if (!error) {
       setPosts(posts.filter(p => p.id !== postToDelete));
-      toast({ title: "Deleted", description: "Your post has been deleted." });
+      
+      // Deduct 30 points if user is deleting their own post
+      if (isOwnPost) {
+        deductPoints(30);
+        toast({ title: "Deleted", description: "Your post has been deleted. -30 points deducted." });
+      } else {
+        toast({ title: "Deleted", description: "Your post has been deleted." });
+      }
     } else {
       toast({ title: "Error", description: "Failed to delete post." });
     }

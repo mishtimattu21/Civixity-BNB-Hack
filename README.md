@@ -32,7 +32,14 @@ cd <YOUR_PROJECT_NAME>
 # Step 3: Install the necessary dependencies.
 npm i
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
+# Step 4: Set up environment variables (optional for development)
+# Create a .env file in the root directory with the following variables:
+# VITE_SUPABASE_URL=https://your-project.supabase.co
+# VITE_SUPABASE_ANON_KEY=your-anon-key
+# VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+# VITE_BACKEND_URL=http://localhost:4000
+
+# Step 5: Start the development server with auto-reloading and an instant preview.
 npm run dev
 ```
 
@@ -63,6 +70,17 @@ This project is built with:
 ## How can I deploy this project?
 
 Simply open [Lovable](https://lovable.dev/projects/1f7ed081-f8d2-4758-a7ce-0a16ef4b65cb) and click on Share -> Publish.
+
+### Environment Variables for Deployment
+
+When deploying, you may need to set the following environment variables in your hosting platform:
+
+- `VITE_SUPABASE_URL`: Your Supabase project URL
+- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
+- `VITE_GOOGLE_MAPS_API_KEY`: Google Maps API key (for Heatmaps feature)
+- `VITE_BACKEND_URL`: Backend server URL (for ChatBot feature)
+
+**Note**: The application will work without these variables but with limited functionality (localStorage fallbacks will be used).
 
 ## Can I connect a custom domain to my Lovable project?
 
