@@ -38,9 +38,11 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed, user }: NavbarProps) =>
           </Button>
           
           <div className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-gradient-to-r from-teal-500 to-blue-600 rounded-lg flex items-center justify-center">
-              <span className="text-white font-bold text-sm">C</span>
-            </div>
+            <img 
+              src="/logo.jpg" 
+              alt="Civixity Logo" 
+              className="w-8 h-8 rounded-lg object-cover"
+            />
             <span className="text-xl font-bold bg-gradient-to-r from-teal-600 to-blue-600 bg-clip-text text-transparent">
               Civixity
             </span>
