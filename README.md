@@ -176,15 +176,3 @@ npm run dev
 - Deploy backend (Node.js) to Render, Railway, or your preferred host.
 - Set environment variables in your deployment platform.
 
----
-
-## 📄 License
-
-MIT
-
----
-
-## 👥 Credits
-
-- Civixity Team
-- Built with [Supabase](https://supabase.com/), [Gemini AI](https://makersuite.google.com/), [shadcn/ui](https://ui.shadcn.com/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/)
