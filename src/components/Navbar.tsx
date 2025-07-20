@@ -11,6 +11,7 @@ import {
 import { useTheme } from "@/components/theme-provider";
 import { Moon, Sun } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { usePoints } from "@/contexts/PointsContext";
 
 interface NavbarProps {
   sidebarCollapsed: boolean;
@@ -21,6 +22,7 @@ interface NavbarProps {
 const Navbar = ({ sidebarCollapsed, setSidebarCollapsed, user }: NavbarProps) => {
   const { theme, setTheme } = useTheme();
   const navigate = useNavigate();
+  const { userPoints, loading } = usePoints();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 dark:bg-slate-800/95 backdrop-blur-sm border-b border-slate-200 dark:border-slate-700">
@@ -49,7 +51,9 @@ const Navbar = ({ sidebarCollapsed, setSidebarCollapsed, user }: NavbarProps) =>
           {/* CIVI Points */}
           <div className="flex items-center space-x-2 bg-gradient-to-r from-yellow-100 to-orange-100 dark:from-yellow-900/30 dark:to-orange-900/30 px-3 py-1 rounded-full">
             <Coins className="h-4 w-4 text-yellow-600 dark:text-yellow-400" />
-            <span className="font-semibold text-yellow-700 dark:text-yellow-300">1,247</span>
+            <span className="font-semibold text-yellow-700 dark:text-yellow-300">
+              {loading ? "..." : userPoints.toLocaleString()}
+            </span>
             <span className="text-sm text-yellow-600 dark:text-yellow-400">CIVI</span>
           </div>
 
