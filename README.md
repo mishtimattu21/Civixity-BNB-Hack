@@ -1,91 +1,190 @@
-# Welcome to your Lovable project
+# Civixity: Next-Gen Civic Engagement Platform
 
-## Project info
+![Civixity Logo](public/logo.jpg)
 
-**URL**: https://lovable.dev/projects/1f7ed081-f8d2-4758-a7ce-0a16ef4b65cb
+Civixity is a modern, AI-powered civic engagement platform for cities and communities. It empowers citizens to report issues, participate in governance, join volunteer activities, and earn rewards—all in a beautiful, gamified web experience.
 
-## How can I edit this code?
+---
 
-There are several ways of editing your application.
+## 🚀 Features
 
-**Use Lovable**
+- **AI-Powered Civic Assistant**  
+  Get instant help and information with an AI chatbot that answers questions, guides users, and summarizes city activity.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/1f7ed081-f8d2-4758-a7ce-0a16ef4b65cb) and start prompting.
+- **Smart Issue Reporting & Detection**  
+  Report civic issues with photos and location. Advanced AI detects image authenticity and categorizes issues for faster resolution.
 
-Changes made via Lovable will be committed automatically to this repo.
+- **Real-Time City Heatmaps & Analytics**  
+  Visualize civic issues, trends, and department performance with interactive heatmaps and analytics dashboards.
 
-**Use your preferred IDE**
+- **Community DAO & Polls**  
+  Participate in city governance through community polls and DAO voting. Help prioritize projects and funding democratically.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+- **Volunteer Activities & Events**  
+  Discover, join, and track local volunteer events. Earn points and badges for making a difference in your community.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+- **Rewards, Badges & Points Economy**  
+  Earn CIVI points for engagement, unlock badges, and redeem rewards for real-world benefits and recognition.
 
-Follow these steps:
+- **City Resources & Documents**  
+  Access important city documents, emergency contacts, and public resources in one place.
+
+---
+
+## 🏗️ Project Structure
+
+```
+civi/
+  backend/         # Node.js/Express backend (API, AI, Supabase integration)
+    config/        # Supabase and Gemini AI config
+    routes/        # API endpoints (chatbot, image detection)
+    uploads/       # Uploaded images for AI detection
+    trial.py       # Python script for deepfake image detection
+    package.json   # Backend dependencies
+    README.md      # Backend-specific documentation
+  src/             # React frontend (Vite, TypeScript, shadcn-ui, Tailwind)
+    components/    # UI components (ChatBot, Navbar, Sidebar, etc.)
+      ui/          # shadcn/ui-based reusable components
+    contexts/      # React context providers (e.g., PointsContext)
+    hooks/         # Custom React hooks
+    lib/           # Supabase client, utility functions
+    pages/         # Main user-facing pages (Home, Polls, Heatmaps, etc.)
+    index.css      # Global styles
+    App.tsx        # Main app entry
+  public/          # Static assets (logo, images, favicon)
+  database-schema.sql # Supabase SQL schema for points, redemptions, donations, etc.
+  README.md        # Main project documentation
+```
+
+---
+
+## 🖥️ Tech Stack
+
+- **Frontend:** React, Vite, TypeScript, shadcn-ui, Tailwind CSS, React Router, Recharts, Google Maps API
+- **Backend:** Node.js, Express, Supabase, Gemini AI, Python (image deepfake detection)
+- **Database:** Supabase (PostgreSQL)
+- **Authentication:** Supabase Auth (email, Google)
+- **APIs:** RESTful endpoints for chatbot, posts, analytics, image detection
+
+---
+
+## ⚡ Getting Started
+
+### Prerequisites
+
+- Node.js (v18+ recommended)
+- npm
+- Supabase account (for database and auth)
+- Google API key (for Maps/Heatmaps)
+- Gemini AI API key (for chatbot)
+
+### 1. Clone the Repository
 
 ```sh
-# Step 1: Clone the repository using the project's Git URL.
 git clone <YOUR_GIT_URL>
+cd civi
+```
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+### 2. Install Dependencies
 
-# Step 3: Install the necessary dependencies.
-npm i
+```sh
+npm install
+cd backend
+npm install
+```
 
-# Step 4: Set up environment variables (optional for development)
-# Create a .env file in the root directory with the following variables:
-# VITE_SUPABASE_URL=https://your-project.supabase.co
-# VITE_SUPABASE_ANON_KEY=your-anon-key
-# VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
-# VITE_BACKEND_URL=http://localhost:4000
+### 3. Environment Variables
 
-# Step 5: Start the development server with auto-reloading and an instant preview.
+Create a `.env` file in the root and in `/backend`:
+
+#### Frontend (`.env` in root)
+
+```
+VITE_SUPABASE_URL=your-supabase-url
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_GOOGLE_MAPS_API_KEY=your-google-maps-api-key
+VITE_BACKEND_URL=http://localhost:4000
+```
+
+#### Backend (`backend/.env`)
+
+```
+SUPABASE_URL=your-supabase-url
+SUPABASE_ANON_KEY=your-supabase-anon-key
+SUPABASE_SERVICE_ROLE_KEY=your-supabase-service-role-key
+GEMINI_API_KEY=your-gemini-api-key
+PORT=4000
+FRONTEND_URL=http://localhost:5173
+```
+
+### 4. Database Setup
+
+- Run the SQL in `database-schema.sql` in your Supabase SQL editor to create all required tables and policies.
+
+### 5. Run the App
+
+**Frontend:**
+```sh
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+**Backend:**
+```sh
+cd backend
+npm run dev
+```
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+---
 
-**Use GitHub Codespaces**
+## 🧩 Key Modules & Pages
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+- **ChatBot:** AI-powered assistant for civic queries and help (`src/components/ChatBot.tsx`)
+- **Home:** Report issues, see recent activity, and interact with the community (`src/pages/HomePage.tsx`)
+- **Polls:** Participate in DAO-style voting and city governance (`src/pages/Polls.tsx`)
+- **Heatmaps:** Visualize city issues and analytics (`src/pages/Heatmaps.tsx`)
+- **Volunteer Activities:** Join and track local events (`src/pages/VolunteerActivities.tsx`)
+- **Redeem Points:** Exchange points for rewards or donate to NGOs (`src/pages/RedeemPoints.tsx`)
+- **Badges:** Track achievements and gamification progress (`src/pages/Badges.tsx`)
+- **Documents:** Access city resources and important documents (`src/pages/Documents.tsx`)
+- **Reusable UI:** 40+ shadcn/ui-based components in `src/components/ui/`
+- **Context & Hooks:** Points management, toast notifications, mobile detection, etc.
 
-## What technologies are used for this project?
+---
 
-This project is built with:
+## 🛠️ Scripts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `npm run dev` – Start frontend in development mode
+- `npm run build` – Build frontend for production
+- `npm run preview` – Preview production build
+- `cd backend && npm run dev` – Start backend in development mode
 
-## How can I deploy this project?
+---
 
-Simply open [Lovable](https://lovable.dev/projects/1f7ed081-f8d2-4758-a7ce-0a16ef4b65cb) and click on Share -> Publish.
+## 📝 API Endpoints (Backend)
 
-### Environment Variables for Deployment
+- `POST /api/chatbot/chat` – AI chatbot
+- `POST /api/detect-image` – AI image authenticity detection
+- `GET /api/chatbot/posts/location/:location` – Posts by location
+- `GET /api/chatbot/posts/category/:category` – Posts by category
+- `GET /api/chatbot/posts/summary` – Recent posts summary
 
-When deploying, you may need to set the following environment variables in your hosting platform:
+---
 
-- `VITE_SUPABASE_URL`: Your Supabase project URL
-- `VITE_SUPABASE_ANON_KEY`: Your Supabase anonymous key
-- `VITE_GOOGLE_MAPS_API_KEY`: Google Maps API key (for Heatmaps feature)
-- `VITE_BACKEND_URL`: Backend server URL (for ChatBot feature)
+## 🌐 Deployment
 
-**Note**: The application will work without these variables but with limited functionality (localStorage fallbacks will be used).
+- Deploy frontend (Vite) to Vercel, Netlify, or your preferred host.
+- Deploy backend (Node.js) to Render, Railway, or your preferred host.
+- Set environment variables in your deployment platform.
 
-## Can I connect a custom domain to my Lovable project?
+---
 
-Yes, you can!
+## 📄 License
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+MIT
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+---
+
+## 👥 Credits
+
+- Civixity Team
+- Built with [Supabase](https://supabase.com/), [Gemini AI](https://makersuite.google.com/), [shadcn/ui](https://ui.shadcn.com/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/)
