@@ -260,10 +260,11 @@ const LandingPage = () => {
                       Sign In
                     </Button>
                   </DialogTrigger>
-                  <DialogContent className="max-w-md bg-white dark:bg-slate-800">
+                  <DialogContent className="max-w-md bg-white dark:bg-slate-800" aria-describedby="dialog-desc">
                     <DialogHeader>
                       <DialogTitle className="text-slate-900 dark:text-white">Sign In</DialogTitle>
                     </DialogHeader>
+                    <p id="dialog-desc" className="sr-only">Sign in to your account using email, password, or Google.</p>
                     <form onSubmit={handleEmailSignIn} className="space-y-4">
                       <Input
                         type="email"
@@ -544,10 +545,11 @@ const LandingPage = () => {
 
       {user && (
         <Dialog open={showUsernameModal} onOpenChange={setShowUsernameModal}>
-          <DialogContent>
+          <DialogContent aria-describedby="username-desc">
             <DialogHeader>
               <DialogTitle className="text-slate-900 dark:text-white">Choose a Unique Username</DialogTitle>
             </DialogHeader>
+            <p id="username-desc" className="sr-only">Set a unique username for your profile.</p>
             <form onSubmit={handleSetUsername} className="space-y-4">
               <Input
                 value={username}

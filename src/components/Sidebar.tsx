@@ -9,6 +9,8 @@ import {
   Map, 
   Award, 
   FileText,
+  PieChart,
+  BarChart2,
   ChevronLeft,
   ChevronRight
 } from "lucide-react";
@@ -28,7 +30,7 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
     { icon: Map, label: "Heatmaps & Insights", path: "/platform/heatmaps" },
     { icon: Award, label: "Badges & Achievements", path: "/platform/badges" },
     { icon: FileText, label: "Documents", path: "/platform/documents" },
-    { icon: ChevronLeft, label: "Polls", path: "/platform/polls" },
+    { icon: [BarChart2], label: "Polls", path: "/platform/polls" },
   ];
 
   const isActive = (path: string) => {
@@ -70,7 +72,15 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
                       : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                   }`}
                 >
-                  <item.icon className="h-5 w-5 flex-shrink-0" />
+                  {Array.isArray(item.icon) ? (
+                    <span className="flex items-center gap-1">
+                      {item.icon.map((IconComp, idx) => (
+                        <IconComp key={idx} className="h-5 w-5 flex-shrink-0" />
+                      ))}
+                    </span>
+                  ) : (
+                    <item.icon className="h-5 w-5 flex-shrink-0" />
+                  )}
                   {!isCollapsed && <span className="text-sm font-medium">{item.label}</span>}
                 </NavLink>
               </li>
@@ -119,7 +129,15 @@ const Sidebar = ({ collapsed }: SidebarProps) => {
                           : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
                       }`}
                     >
-                      <item.icon className="h-5 w-5 flex-shrink-0" />
+                      {Array.isArray(item.icon) ? (
+                        <span className="flex items-center gap-1">
+                          {item.icon.map((IconComp, idx) => (
+                            <IconComp key={idx} className="h-5 w-5 flex-shrink-0" />
+                          ))}
+                        </span>
+                      ) : (
+                        <item.icon className="h-5 w-5 flex-shrink-0" />
+                      )}
                       <span className="text-sm font-medium">{item.label}</span>
                     </NavLink>
                   </li>

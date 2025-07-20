@@ -74,6 +74,9 @@ const HomePage = () => {
   const [uploading, setUploading] = useState(false);
   const { toast } = useToast();
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [aiDialogOpen, setAIDialogOpen] = useState(false);
+  const [aiDetected, setAIDetected] = useState(false);
+  const [aiDetectionChecked, setAIDetectionChecked] = useState(false);
 
   // Track user votes per post in localStorage
   const [userVotes, setUserVotes] = useState<{ [postId: number]: 'up' | 'down' | null }>({});
@@ -131,9 +134,30 @@ const HomePage = () => {
   }, []);
 
   // Handle image file selection
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      setNewPost({ ...newPost, image: e.target.files[0] });
+      const file = e.target.files[0];
+      setNewPost({ ...newPost, image: file });
+      // AI detection
+      const formData = new FormData();
+      formData.append('image', file);
+      try {
+        const response = await fetch('http://localhost:4000/api/detect-image', {
+          method: 'POST',
+          body: formData
+        });
+        const data = await response.json();
+        setAIDetectionChecked(true);
+        if (data.result === 'AI') {
+          setAIDetected(true);
+        } else {
+          setAIDetected(false);
+        }
+      } catch (err) {
+        setAIDetectionChecked(true);
+        setAIDetected(false);
+        console.error('AI detection error', err);
+      }
     }
   };
 
@@ -597,6 +621,11 @@ const HomePage = () => {
               <div className="flex items-center space-x-2">
                 <Input type="file" accept="image/*" id="image" onChange={handleImageChange} />
               </div>
+              {aiDetectionChecked && aiDetected && (
+                <div className="mt-2 p-3 border-2 border-red-600 bg-red-50 text-red-700 rounded">
+                  <strong>Warning:</strong> The image you uploaded appears to be <span className="font-bold">AI-generated</span>. Please upload a real, time-taken image for your report.
+                </div>
+              )}
             </div>
             <div className="flex items-center space-x-2">
               <input
@@ -608,7 +637,7 @@ const HomePage = () => {
               />
               <Label htmlFor="postAnonymous">Post as anonymous</Label>
             </div>
-            <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600" type="submit" disabled={uploading}>
+            <Button className="w-full bg-gradient-to-r from-teal-500 to-blue-600" type="submit" disabled={uploading || aiDetected}>
               {uploading ? 'Submitting...' : 'Submit Report'}
             </Button>
           </form>
@@ -630,6 +659,21 @@ const HomePage = () => {
             {usernameError && <div className="text-red-500 text-sm">{usernameError}</div>}
             <Button type="submit" className="w-full bg-gradient-to-r from-teal-500 to-blue-600">Set Username</Button>
           </form>
+        </DialogContent>
+      </Dialog>
+
+      {/* AI Detection Dialog */}
+      <Dialog open={aiDialogOpen} onOpenChange={setAIDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>AI-generated Image Detected</DialogTitle>
+          </DialogHeader>
+          <div className="mb-4 text-slate-700 dark:text-slate-300">
+            The image you uploaded appears to be AI-generated. Please upload a real, time-taken image for your report.
+          </div>
+          <div className="flex justify-end gap-2">
+            <Button onClick={() => setAIDialogOpen(false)}>OK</Button>
+          </div>
         </DialogContent>
       </Dialog>
 
